@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Login Page Styling */
+
+.login_page {
+  height: 100%;
+}
+
+.login_page::before {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  z-index: -1;
+  background-image: url("/Images/login.jpg");
+  background-size: cover;
+  filter: blur(1.5px);
+  -webkit-filter: blur(0.2px);
+}
+
+.login_page::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  z-index: -1;
+  background: #0000008f;
+}
+
+/* SubMenu Styling */
+
+.submenu-hidden {
+  /* display: none; */
+  opacity: 0;
+  transform: scaleY(0.9);
+  height: 0;
+}
+
+.submenu-visible {
+  /*display: block;
+  */
+  opacity: 1;
+  transform: scaleY(1);
+  height: auto;
+  transition: all 0.3s ease-in-out;
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+  -ms-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+}
+
+.submenu-sideOpen {
+  opacity: 1;
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: 100%;
+  min-width: 180px;
+  background: #242f35;
+  z-index: 999;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  transition: all 0.2s ease-in-out;
+}
+
+.hidden {
+  opacity: 0;
+  width: 0px;
+  transform: translateY(-10px);
+}

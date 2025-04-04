@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Positioning Next and Prev buttons */
+.owl-nav {
+  position: absolute;
+  top: 30%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  z-index: 10; /* Ensures buttons are above images */
+}
+
+/* Style the Prev Button */
+.owl-prev {
+  position: absolute;
+  left: 0;
+  background: rgba(0, 0, 0, 0.6) !important;
+  color: white !important;
+  font-size: 20px !important;
+  width: 50px;
+  height: 50px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* Style the Next Button */
+.owl-next {
+  position: absolute;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6) !important;
+  color: white !important;
+  font-size: 20px !important;
+  width: 50px;
+  height: 50px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* Ensure buttons are visible */
+.owl-prev:hover,
+.owl-next:hover {
+  background: rgba(0, 0, 0, 0.9) !important;
+}
+
+/* Loading Page Style */
+.wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #00f;
+}
+
+.wrapper_inner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.pillar {
+  display: inline-block;
+  width: 3px;
+  height: 25px;
+  background-color: #fff;
+  animation: loading 1.5s cubic-bezier(0.8, 0.5, 0.2, 1.4) infinite;
+  transform-origin: bottom center;
+  position: relative;
+}
+
+@keyframes loading {
+  0% {
+    transform: translateY(0px);
+    background-color: #fcdc29;
+  }
+  50% {
+    transform: translateY(50px);
+    background-color: #ef584a;
+  }
+  100% {
+    transform: translateY(0px);
+    background-color: #fcdc29;
+  }
+}
+.pillar-1 {
+  animation-delay: 0.1s;
+}
+.pillar-2 {
+  animation-delay: 0.2s;
+}
+.pillar-3 {
+  animation-delay: 0.3s;
+}
+.pillar-4 {
+  animation-delay: 0.4s;
+}
+.pillar-5 {
+  animation-delay: 0.5s;
+}
+.pillar-6 {
+  animation-delay: 0.6s;
+}
+.pillar-7 {
+  animation-delay: 0.7s;
+}
+.pillar-8 {
+  animation-delay: 0.8s;
+}
