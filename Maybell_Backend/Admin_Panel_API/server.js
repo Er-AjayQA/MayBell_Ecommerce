@@ -7,13 +7,17 @@ const DBConnection = require("./config/db.config");
 
 // Importing All Routes
 const defaultRoutes = require("./api/default/router/default.router");
+const materialsRoutes = require("./api/Materials/router/materials.router");
+const colorsRoutes = require("./api/Colors/router/colors.router");
 
 // Using Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes Middlewares
-app.use("/v1/api/default", defaultRoutes);
+app.use("/api/v1/admin/default", defaultRoutes);
+app.use("/api/v1/admin/materials", materialsRoutes);
+app.use("/api/v1/admin/colors", colorsRoutes);
 
 // Listening to Server
 app.listen(PORT, (err) => {

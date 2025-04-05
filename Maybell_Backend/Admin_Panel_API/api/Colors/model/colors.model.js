@@ -1,9 +1,14 @@
 // Imports & Configs
 const mongoose = require("mongoose");
 
-// Define Default Schema
-const DefaultSchema = new mongoose.Schema({
+// Define Colors Schema
+const ColorsSchema = new mongoose.Schema({
   name: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  color_code: {
     type: String,
     required: true,
     unique: true,
@@ -28,4 +33,4 @@ const DefaultSchema = new mongoose.Schema({
 });
 
 // Create And Export Model
-module.exports = mongoose.model("default", DefaultSchema);
+module.exports = mongoose.model("color", ColorsSchema);

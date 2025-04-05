@@ -1,26 +1,26 @@
 // Imports & Configs
-const DefaultModel = require("../model/default.model");
+const ColorsModel = require("../model/colors.model");
 
 // Create New Data
 exports.create = async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, color_code } = req.body;
 
-    const getAllData = await DefaultModel.find();
+    const getAllData = await ColorsModel.find();
 
     let lastOrderValue = 0;
     if (getAllData.length >= 1) {
       lastOrderValue = getAllData[getAllData.length - 1].order;
     }
 
-    const data = { name, order: lastOrderValue + 1 };
+    const data = { name, color_code, order: lastOrderValue + 1 };
 
-    const createData = await DefaultModel.create(data);
+    const createData = await ColorsModel.create(data);
     await createData.save();
 
     return res.status(201).json({
       success: true,
-      message: "Data created successfully!!",
+      message: "Color created successfully!!",
       data: createData,
     });
   } catch (error) {
@@ -35,6 +35,7 @@ exports.create = async (req, res) => {
 // View All Data
 exports.getAll = async (req, res) => {
   try {
+    const { name, color_code } = req.body;
     let limit = parseInt(req?.body?.limit) || 15;
     let page = parseInt(req?.body?.page) || 1;
     if (limit < 1) limit = 15;
@@ -44,12 +45,16 @@ exports.getAll = async (req, res) => {
 
     const filter = { deletedAt: null };
 
-    if (req.body.name != "" && req.body.name != undefined) {
-      var nameRegex = new RegExp(req.body.name, "i");
+    if (name != "" && name != undefined) {
+      var nameRegex = new RegExp(name, "i");
       filter.name = nameRegex;
     }
+    if (color_code != "" && color_code != undefined) {
+      var colorRegex = new RegExp(color_code, "i");
+      filter.color_code = colorRegex;
+    }
 
-    const getAllData = await DefaultModel.find(filter)
+    const getAllData = await ColorsModel.find(filter)
       .limit(limit)
       .skip(skip)
       .sort({
@@ -81,7 +86,7 @@ exports.getDetails = async (req, res) => {
 
     const filter = { deletedAt: null };
 
-    const getDetails = await DefaultModel.findOne({ ...filter, _id: id });
+    const getDetails = await ColorsModel.findOne({ ...filter, _id: id });
 
     return res.status(200).json({
       success: true,
@@ -101,14 +106,11 @@ exports.getDetails = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name } = req.body;
+    const { name, color_code } = req.body;
 
-    const data = { name };
+    const data = { name, color_code };
 
-    const updateData = await DefaultModel.updateOne(
-      { _id: id },
-      { $set: data }
-    );
+    const updateData = await ColorsModel.updateOne({ _id: id }, { $set: data });
 
     return res.status(201).json({
       success: true,
@@ -129,7 +131,7 @@ exports.updateStatus = async (req, res) => {
   try {
     const { ids } = req.body;
 
-    const updateData = await DefaultModel.updateMany({ _id: { $in: ids } }, [
+    const updateData = await ColorsModel.updateMany({ _id: { $in: ids } }, [
       { $set: { status: { $not: "$status" } } },
     ]);
 
@@ -152,14 +154,14 @@ exports.delete = async (req, res) => {
   try {
     const { ids } = req.body;
 
-    const deleteData = await DefaultModel.updateMany(
+    const deleteData = await ColorsModel.updateMany(
       { _id: { $in: ids } },
       { $set: { deletedAt: Date.now() } }
     );
 
     return res.status(201).json({
       success: true,
-      message: "Data deleted successfully!!",
+      message: "Colors deleted successfully!!",
       data: deleteData,
     });
   } catch (error) {

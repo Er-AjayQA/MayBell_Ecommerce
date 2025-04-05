@@ -1,12 +1,12 @@
 // Imports & Configs
-const DefaultModel = require("../model/default.model");
+const MaterialsModel = require("../model/materials.model");
 
-// Create New Data
+// Create New Material
 exports.create = async (req, res) => {
   try {
     const { name } = req.body;
 
-    const getAllData = await DefaultModel.find();
+    const getAllData = await MaterialsModel.find();
 
     let lastOrderValue = 0;
     if (getAllData.length >= 1) {
@@ -15,13 +15,13 @@ exports.create = async (req, res) => {
 
     const data = { name, order: lastOrderValue + 1 };
 
-    const createData = await DefaultModel.create(data);
-    await createData.save();
+    const createMaterial = await MaterialsModel.create(data);
+    await createMaterial.save();
 
     return res.status(201).json({
       success: true,
-      message: "Data created successfully!!",
-      data: createData,
+      message: "Material created successfully!!",
+      data: createMaterial,
     });
   } catch (error) {
     return res.status(500).json({
@@ -32,7 +32,7 @@ exports.create = async (req, res) => {
   }
 };
 
-// View All Data
+// Get All Materials
 exports.getAll = async (req, res) => {
   try {
     let limit = parseInt(req?.body?.limit) || 15;
@@ -49,7 +49,7 @@ exports.getAll = async (req, res) => {
       filter.name = nameRegex;
     }
 
-    const getAllData = await DefaultModel.find(filter)
+    const getAllData = await MaterialsModel.find(filter)
       .limit(limit)
       .skip(skip)
       .sort({
@@ -74,14 +74,14 @@ exports.getAll = async (req, res) => {
   }
 };
 
-// View Details
+// Get Material Details
 exports.getDetails = async (req, res) => {
   try {
     const { id } = req.params;
 
     const filter = { deletedAt: null };
 
-    const getDetails = await DefaultModel.findOne({ ...filter, _id: id });
+    const getDetails = await MaterialsModel.findOne({ ...filter, _id: id });
 
     return res.status(200).json({
       success: true,
@@ -97,7 +97,7 @@ exports.getDetails = async (req, res) => {
   }
 };
 
-// Update Data By Id
+// Update Material By Id
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
@@ -105,7 +105,7 @@ exports.update = async (req, res) => {
 
     const data = { name };
 
-    const updateData = await DefaultModel.updateOne(
+    const updateData = await MaterialsModel.updateOne(
       { _id: id },
       { $set: data }
     );
@@ -129,7 +129,7 @@ exports.updateStatus = async (req, res) => {
   try {
     const { ids } = req.body;
 
-    const updateData = await DefaultModel.updateMany({ _id: { $in: ids } }, [
+    const updateData = await MaterialsModel.updateMany({ _id: { $in: ids } }, [
       { $set: { status: { $not: "$status" } } },
     ]);
 
@@ -147,12 +147,12 @@ exports.updateStatus = async (req, res) => {
   }
 };
 
-// Delete Data By Ids
+// Delete Materials By Ids
 exports.delete = async (req, res) => {
   try {
     const { ids } = req.body;
 
-    const deleteData = await DefaultModel.updateMany(
+    const deleteData = await MaterialsModel.updateMany(
       { _id: { $in: ids } },
       { $set: { deletedAt: Date.now() } }
     );
