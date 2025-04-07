@@ -1,26 +1,40 @@
 // Imports & Configs
-const ColorsModel = require("../model/colors.model");
+const ChooseModel = require("../model/whyChooseUs.model");
 
-// Create New Data
+// Create New Slider Data
 exports.create = async (req, res) => {
   try {
-    const { name, color_code } = req.body;
+    const { title, choose_order, description } = req.body;
+    const image_path = req.file.path;
 
-    const getAllData = await ColorsModel.find();
+    if (!image_path) {
+      return res.status(400).json({
+        success: false,
+        message: "No image uploaded!!",
+      });
+    }
+
+    const getAllData = await ChooseModel.find();
 
     let lastOrderValue = 0;
     if (getAllData.length >= 1) {
       lastOrderValue = getAllData[getAllData.length - 1].order;
     }
 
-    const data = { name, color_code, order: lastOrderValue + 1 };
+    const data = {
+      title,
+      choose_order,
+      description,
+      image: image_path,
+      order: lastOrderValue + 1,
+    };
 
-    const createData = await ColorsModel.create(data);
+    const createData = await ChooseModel.create(data);
     await createData.save();
 
     return res.status(201).json({
       success: true,
-      message: "Color created successfully!!",
+      message: "Data created successfully!!",
       data: createData,
     });
   } catch (error) {
@@ -32,10 +46,10 @@ exports.create = async (req, res) => {
   }
 };
 
-// View All Data
+// View All Sliders Data
 exports.getAll = async (req, res) => {
   try {
-    const { name, color_code } = req.body;
+    const { title } = req.body;
     let limit = parseInt(req?.body?.limit) || 15;
     let page = parseInt(req?.body?.page) || 1;
     if (limit < 1) limit = 15;
@@ -45,29 +59,29 @@ exports.getAll = async (req, res) => {
 
     const filter = { deletedAt: null };
 
-    if (name != "" && name != undefined) {
-      var nameRegex = new RegExp(name, "i");
-      filter.name = nameRegex;
-    }
-    if (color_code != "" && color_code != undefined) {
-      var colorRegex = new RegExp(color_code, "i");
-      filter.color_code = colorRegex;
+    if (title != "" && title != undefined) {
+      var titleRegex = new RegExp(title, "i");
+      filter.title = titleRegex;
     }
 
-    const getAllData = await ColorsModel.find(filter)
+    const getAllData = await ChooseModel.find(filter)
       .limit(limit)
       .skip(skip)
       .sort({
         _id: "desc",
       });
 
-    return res.status(200).json({
-      success: true,
+    const statusCode = getAllData.length >= 1 ? 200 : 404;
+    const success = getAllData.length >= 1 ? true : false;
+    const message =
+      getAllData.length >= 1
+        ? "Fetched data successfully!!"
+        : "No Records Found";
+
+    return res.status(statusCode).json({
+      success,
       totalRecords: getAllData.length >= 1 ? getAllData.length : 0,
-      message:
-        getAllData.length >= 1
-          ? "Fetched data successfully!!"
-          : "No Records Found",
+      message,
       data: getAllData,
     });
   } catch (error) {
@@ -79,14 +93,14 @@ exports.getAll = async (req, res) => {
   }
 };
 
-// View Details
+// View Slider Details
 exports.getDetails = async (req, res) => {
   try {
     const { id } = req.params;
 
     const filter = { deletedAt: null };
 
-    const getDetails = await ColorsModel.findOne({ ...filter, _id: id });
+    const getDetails = await ChooseModel.findOne({ ...filter, _id: id });
 
     const success = !getDetails ? false : true;
     const responseStatus = !getDetails ? 404 : 200;
@@ -108,15 +122,31 @@ exports.getDetails = async (req, res) => {
   }
 };
 
-// Update Data By Id
+// Update Slider Data By Id
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, color_code } = req.body;
+    const { title, choose_order, description } = req.body;
+    const image_path = req.file.path;
 
-    const data = { name, color_code };
+    const existingData = await ChooseModel.findOne({ _id: id });
 
-    const updateData = await ColorsModel.updateOne({ _id: id }, { $set: data });
+    if (!existingData) {
+      return res.status(400).json({
+        success: false,
+        message: "Data not found!!",
+        data: {},
+      });
+    }
+
+    const data = {
+      title: title ? title : existingData.title,
+      choose_order: choose_order ? choose_order : existingData.choose_order,
+      description: description ? description : existingData.description,
+      image: image_path ? image_path : existingData.image_path,
+    };
+
+    const updateData = await ChooseModel.updateOne({ _id: id }, { $set: data });
 
     return res.status(201).json({
       success: true,
@@ -132,12 +162,12 @@ exports.update = async (req, res) => {
   }
 };
 
-// Change Status
+// Change Slider Status
 exports.updateStatus = async (req, res) => {
   try {
     const { ids } = req.body;
 
-    const updateData = await ColorsModel.updateMany({ _id: { $in: ids } }, [
+    const updateData = await ChooseModel.updateMany({ _id: { $in: ids } }, [
       { $set: { status: { $not: "$status" } } },
     ]);
 
@@ -155,12 +185,12 @@ exports.updateStatus = async (req, res) => {
   }
 };
 
-// Delete Data By Ids
+// Delete Slider Data By Ids
 exports.delete = async (req, res) => {
   try {
     const { ids } = req.body;
 
-    const deleteData = await ColorsModel.updateMany(
+    const deleteData = await ChooseModel.updateMany(
       { _id: { $in: ids } },
       { $set: { deletedAt: Date.now() } }
     );

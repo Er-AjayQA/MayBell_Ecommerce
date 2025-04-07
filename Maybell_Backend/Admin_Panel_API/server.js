@@ -9,6 +9,11 @@ const DBConnection = require("./config/db.config");
 const defaultRoutes = require("./api/default/router/default.router");
 const materialsRoutes = require("./api/Materials/router/materials.router");
 const colorsRoutes = require("./api/Colors/router/colors.router");
+const adminsRoutes = require("./api/Admins/router/admin.router");
+const slidersRoutes = require("./api/Sliders/router/sliders.router");
+const testimonialsRoutes = require("./api/Testimonials/router/testimonials.router");
+const whyChooseUsRoutes = require("./api/WhyChooseUs/router/whyChooseUs.router");
+const couponsRoutes = require("./api/Coupons/router/coupons.router");
 
 // Using Middlewares
 app.use(express.json());
@@ -18,6 +23,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/v1/admin/default", defaultRoutes);
 app.use("/api/v1/admin/materials", materialsRoutes);
 app.use("/api/v1/admin/colors", colorsRoutes);
+app.use("/api/v1/admin/admin-user", adminsRoutes);
+app.use("/api/v1/admin/sliders", slidersRoutes);
+app.use("/api/v1/admin/testimonials", testimonialsRoutes);
+app.use("/api/v1/admin/why-choose-us", whyChooseUsRoutes);
+app.use("/api/v1/admin/coupons", couponsRoutes);
 
 // Listening to Server
 app.listen(PORT, (err) => {

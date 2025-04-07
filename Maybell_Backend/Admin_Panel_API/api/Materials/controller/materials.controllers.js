@@ -83,9 +83,15 @@ exports.getDetails = async (req, res) => {
 
     const getDetails = await MaterialsModel.findOne({ ...filter, _id: id });
 
-    return res.status(200).json({
-      success: true,
-      message: "Fetched details successfully!!",
+    const success = !getDetails ? false : true;
+    const responseStatus = !getDetails ? 404 : 200;
+    const message = !getDetails
+      ? "Data not found!!"
+      : "Fetched details successfully!!";
+
+    return res.status(responseStatus).json({
+      success,
+      message,
       data: getDetails,
     });
   } catch (error) {

@@ -1,26 +1,42 @@
 // Imports & Configs
-const ColorsModel = require("../model/colors.model");
+const TestimonialsModel = require("../model/testimonials.model");
 
-// Create New Data
+// Create New Testimonials Data
 exports.create = async (req, res) => {
   try {
-    const { name, color_code } = req.body;
+    const { name, designation, rating, testimonial_order, message } = req.body;
+    const image_path = req.file.path;
 
-    const getAllData = await ColorsModel.find();
+    if (!image_path) {
+      return res.status(400).json({
+        success: false,
+        message: "No image uploaded!!",
+      });
+    }
+
+    const getAllData = await TestimonialsModel.find();
 
     let lastOrderValue = 0;
     if (getAllData.length >= 1) {
       lastOrderValue = getAllData[getAllData.length - 1].order;
     }
 
-    const data = { name, color_code, order: lastOrderValue + 1 };
+    const data = {
+      name,
+      designation,
+      rating,
+      testimonial_order,
+      message,
+      image: image_path,
+      order: lastOrderValue + 1,
+    };
 
-    const createData = await ColorsModel.create(data);
+    const createData = await TestimonialsModel.create(data);
     await createData.save();
 
     return res.status(201).json({
       success: true,
-      message: "Color created successfully!!",
+      message: "Testimonial created successfully!!",
       data: createData,
     });
   } catch (error) {
@@ -32,10 +48,10 @@ exports.create = async (req, res) => {
   }
 };
 
-// View All Data
+// View All Testimonials Data
 exports.getAll = async (req, res) => {
   try {
-    const { name, color_code } = req.body;
+    const { name, designation, rating } = req.body;
     let limit = parseInt(req?.body?.limit) || 15;
     let page = parseInt(req?.body?.page) || 1;
     if (limit < 1) limit = 15;
@@ -49,25 +65,33 @@ exports.getAll = async (req, res) => {
       var nameRegex = new RegExp(name, "i");
       filter.name = nameRegex;
     }
-    if (color_code != "" && color_code != undefined) {
-      var colorRegex = new RegExp(color_code, "i");
-      filter.color_code = colorRegex;
+    if (designation != "" && designation != undefined) {
+      var designationRegex = new RegExp(designation, "i");
+      filter.designation = designationRegex;
+    }
+    if (rating != "" && rating != undefined) {
+      var ratingRegex = new RegExp(rating, "i");
+      filter.rating = ratingRegex;
     }
 
-    const getAllData = await ColorsModel.find(filter)
+    const getAllData = await TestimonialsModel.find(filter)
       .limit(limit)
       .skip(skip)
       .sort({
         _id: "desc",
       });
 
-    return res.status(200).json({
-      success: true,
+    const statusCode = getAllData.length >= 1 ? 200 : 404;
+    const success = getAllData.length >= 1 ? true : false;
+    const message =
+      getAllData.length >= 1
+        ? "Fetched data successfully!!"
+        : "No Records Found";
+
+    return res.status(statusCode).json({
+      success,
       totalRecords: getAllData.length >= 1 ? getAllData.length : 0,
-      message:
-        getAllData.length >= 1
-          ? "Fetched data successfully!!"
-          : "No Records Found",
+      message,
       data: getAllData,
     });
   } catch (error) {
@@ -79,14 +103,14 @@ exports.getAll = async (req, res) => {
   }
 };
 
-// View Details
+// View Testimonials Details
 exports.getDetails = async (req, res) => {
   try {
     const { id } = req.params;
 
     const filter = { deletedAt: null };
 
-    const getDetails = await ColorsModel.findOne({ ...filter, _id: id });
+    const getDetails = await TestimonialsModel.findOne({ ...filter, _id: id });
 
     const success = !getDetails ? false : true;
     const responseStatus = !getDetails ? 404 : 200;
@@ -108,15 +132,38 @@ exports.getDetails = async (req, res) => {
   }
 };
 
-// Update Data By Id
+// Update Testimonials Data By Id
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, color_code } = req.body;
+    const { name, designation, rating, testimonial_order, message } = req.body;
+    const image_path = req.file.path;
 
-    const data = { name, color_code };
+    const existedData = await TestimonialsModel.findOne({ _id: id });
 
-    const updateData = await ColorsModel.updateOne({ _id: id }, { $set: data });
+    if (!existedData) {
+      return res.status(400).json({
+        success: false,
+        message: "Data not found!!",
+        data: {},
+      });
+    }
+
+    const data = {
+      name: name ? name : existedData.name,
+      designation: designation ? designation : existedData.designation,
+      rating: rating ? rating : existedData.rating,
+      testimonial_order: testimonial_order
+        ? testimonial_order
+        : existedData.testimonial_order,
+      message: message ? message : existedData.message,
+      image: image_path ? image_path : existedData.image_path,
+    };
+
+    const updateData = await TestimonialsModel.updateOne(
+      { _id: id },
+      { $set: data }
+    );
 
     return res.status(201).json({
       success: true,
@@ -132,14 +179,15 @@ exports.update = async (req, res) => {
   }
 };
 
-// Change Status
+// Change Testimonials Status
 exports.updateStatus = async (req, res) => {
   try {
     const { ids } = req.body;
 
-    const updateData = await ColorsModel.updateMany({ _id: { $in: ids } }, [
-      { $set: { status: { $not: "$status" } } },
-    ]);
+    const updateData = await TestimonialsModel.updateMany(
+      { _id: { $in: ids } },
+      [{ $set: { status: { $not: "$status" } } }]
+    );
 
     return res.status(201).json({
       success: true,
@@ -155,12 +203,12 @@ exports.updateStatus = async (req, res) => {
   }
 };
 
-// Delete Data By Ids
+// Delete Testimonials Data By Ids
 exports.delete = async (req, res) => {
   try {
     const { ids } = req.body;
 
-    const deleteData = await ColorsModel.updateMany(
+    const deleteData = await TestimonialsModel.updateMany(
       { _id: { $in: ids } },
       { $set: { deletedAt: Date.now() } }
     );
