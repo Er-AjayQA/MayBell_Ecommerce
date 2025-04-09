@@ -5,9 +5,11 @@ import { SideBarMenu } from "../UI/SideBarMenu";
 export const MainLayout = () => {
   return (
     <>
-      <Header />
-      <SideBarMenu />
-      <Outlet />
+      <div className="relative">
+        <Header />
+        <SideBarMenu />
+        <Outlet />
+      </div>
     </>
   );
 };

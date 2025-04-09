@@ -23,6 +23,7 @@ import { PaymentGateways } from "./Components/Pages/PaymentGateways";
 import { Configurations } from "./Components/Pages/Configurations";
 import { Faq } from "./Components/Pages/Faq";
 import { CmsPages } from "./Components/Pages/CmsPages";
+import { BodyLayout } from "./Components/Layouts/BodyLayout";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -30,55 +31,66 @@ createRoot(document.getElementById("root")).render(
       <Routes>
         <Route path="/furniture/admin-panel/login" element={<LoginPage />} />
         <Route element={<MainLayout />}>
-          <Route path="/furniture/admin-panel" element={<Home />} />
-          <Route path="/furniture/admin-panel/admins" element={<Admins />} />
-          <Route path="/furniture/admin-panel/users" element={<Users />} />
-          <Route
-            path="/furniture/admin-panel/countries"
-            element={<Countries />}
-          />
-          <Route path="/furniture/admin-panel/sliders" element={<Sliders />} />
-          <Route
-            path="/furniture/admin-panel/testimonials"
-            element={<Testimonials />}
-          />
-          <Route
-            path="/furniture/admin-panel/why-choose-us"
-            element={<WhyChooseUs />}
-          />
-          <Route path="/furniture/admin-panel/coupons" element={<Coupons />} />
-          <Route
-            path="/furniture/admin-panel/categories"
-            element={<Categories />}
-          />
-          <Route
-            path="/furniture/admin-panel/materials"
-            element={<Materials />}
-          />
-          <Route path="/furniture/admin-panel/colors" element={<Colors />} />
-          <Route
-            path="/furniture/admin-panel/products"
-            element={<Products />}
-          />
-          <Route path="/furniture/admin-panel/enquiry" element={<Enquiry />} />
-          <Route
-            path="/furniture/admin-panel/newsletters"
-            element={<Newsletters />}
-          />
-          <Route
-            path="/furniture/admin-panel/payment-gateways"
-            element={<PaymentGateways />}
-          />
-          <Route
-            path="/furniture/admin-panel/configurations"
-            element={<Configurations />}
-          />
-          <Route path="/furniture/admin-panel/faq" element={<Faq />} />
-          <Route
-            path="/furniture/admin-panel/cms-pages"
-            element={<CmsPages />}
-          />
-          <Route path="/furniture/admin-panel/*" element={<PageNotFound />} />
+          <Route element={<BodyLayout />}>
+            <Route path="/furniture/admin-panel" element={<Home />} />
+            <Route path="/furniture/admin-panel/admins" element={<Admins />} />
+            <Route path="/furniture/admin-panel/users" element={<Users />} />
+            <Route
+              path="/furniture/admin-panel/countries"
+              element={<Countries />}
+            />
+            <Route
+              path="/furniture/admin-panel/sliders"
+              element={<Sliders />}
+            />
+            <Route
+              path="/furniture/admin-panel/testimonials"
+              element={<Testimonials />}
+            />
+            <Route
+              path="/furniture/admin-panel/why-choose-us"
+              element={<WhyChooseUs />}
+            />
+            <Route
+              path="/furniture/admin-panel/coupons"
+              element={<Coupons />}
+            />
+            <Route
+              path="/furniture/admin-panel/categories"
+              element={<Categories />}
+            />
+            <Route
+              path="/furniture/admin-panel/materials"
+              element={<Materials />}
+            />
+            <Route path="/furniture/admin-panel/colors" element={<Colors />} />
+            <Route
+              path="/furniture/admin-panel/products"
+              element={<Products />}
+            />
+            <Route
+              path="/furniture/admin-panel/enquiry"
+              element={<Enquiry />}
+            />
+            <Route
+              path="/furniture/admin-panel/newsletters"
+              element={<Newsletters />}
+            />
+            <Route
+              path="/furniture/admin-panel/payment-gateways"
+              element={<PaymentGateways />}
+            />
+            <Route
+              path="/furniture/admin-panel/configurations"
+              element={<Configurations />}
+            />
+            <Route path="/furniture/admin-panel/faq" element={<Faq />} />
+            <Route
+              path="/furniture/admin-panel/cms-pages"
+              element={<CmsPages />}
+            />
+            <Route path="/furniture/admin-panel/*" element={<PageNotFound />} />
+          </Route>
         </Route>
       </Routes>
     </CommonContext>
