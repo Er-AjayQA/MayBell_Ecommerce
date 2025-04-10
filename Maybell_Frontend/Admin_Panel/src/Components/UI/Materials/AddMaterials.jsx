@@ -1,8 +1,13 @@
 import { IoClose } from "react-icons/io5";
 import { useForm } from "react-hook-form";
 import { createMaterials } from "../../../Services";
+import { toast } from "react-toastify";
 
-export const AddMaterials = ({ openCreateForm, createForm }) => {
+export const AddMaterials = ({
+  openCreateForm,
+  setOpenCreateForm,
+  createForm,
+}) => {
   const {
     register,
     handleSubmit,
@@ -11,7 +16,10 @@ export const AddMaterials = ({ openCreateForm, createForm }) => {
 
   const onSubmit = async (data) => {
     const response = await createMaterials(data);
-    console.log(response);
+    if (response.success) {
+      toast.success(response.message);
+      setOpenCreateForm();
+    }
   };
 
   return (

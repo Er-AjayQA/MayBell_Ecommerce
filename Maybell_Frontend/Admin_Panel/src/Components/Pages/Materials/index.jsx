@@ -1,15 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaPlus, FaFilter } from "react-icons/fa";
 import { MdFilterAltOff } from "react-icons/md";
 import { BreadCrumb } from "../../UI/Breadcrumb";
 import { AddMaterials } from "../../UI/Materials/AddMaterials";
 import { MaterialFilterForm } from "../../UI/Materials/MaterialFilterForm";
 import { MaterialTableListing } from "../../UI/Materials/MaterialListing";
+import { getAllMaterials } from "../../../Services";
 
 export const Materials = () => {
   const [openCreateForm, setOpenCreateForm] = useState(false);
   const [filterFormStatus, setFilterFormStatus] = useState(false);
   const [filterData, setFilterData] = useState({ name: "" });
+  const [allMaterials, setAllMaterials] = useState([]);
 
   // Handle Create Form Visibility
   const handleCreateFormVisibility = () => {
@@ -31,6 +33,19 @@ export const Materials = () => {
   const handleClearFilterForm = () => {
     setFilterData({ name: "" });
   };
+
+  // Get All Existing Materials
+  const getAllMaterialsData = async () => {
+    let formData = { name: "" };
+    const response = await getAllMaterials(formData);
+    setAllMaterials(response.data);
+  };
+
+  useEffect(() => {
+    getAllMaterialsData();
+  }, []);
+
+  console.log(allMaterials);
 
   return (
     <>
@@ -81,12 +96,16 @@ export const Materials = () => {
         {/* Filter Section End */}
 
         {/* Table Section Start */}
-        <MaterialTableListing />
+        <MaterialTableListing
+          allMaterials={allMaterials}
+          setAllMaterials={setAllMaterials}
+        />
         {/* Table Section End */}
 
         {/* Create Form Start */}
         <AddMaterials
           openCreateForm={openCreateForm}
+          setOpenCreateForm={setOpenCreateForm}
           createForm={handleCreateFormVisibility}
         />
         {/* Create Form End */}

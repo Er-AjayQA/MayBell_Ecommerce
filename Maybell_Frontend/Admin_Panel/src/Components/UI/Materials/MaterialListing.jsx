@@ -5,7 +5,9 @@ import { GrDocumentCsv } from "react-icons/gr";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { TbArrowsSort } from "react-icons/tb";
 
-export const MaterialTableListing = () => {
+export const MaterialTableListing = ({ allMaterials, setAllMaterials }) => {
+  console.log(allMaterials);
+
   return (
     <>
       {/* Table Section Start */}
@@ -98,17 +100,32 @@ export const MaterialTableListing = () => {
               <Table.HeadCell>Action</Table.HeadCell>
             </Table.Head>
             <Table.Body className="divide-y">
-              <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                <Table.Cell className="p-4">
-                  <Checkbox />
-                </Table.Cell>
-                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                  Apple MacBook Pro 17
-                </Table.Cell>
-                <Table.Cell>2</Table.Cell>
-                <Table.Cell>Active</Table.Cell>
-                <Table.Cell>Edit</Table.Cell>
-              </Table.Row>
+              {allMaterials?.length >= 1 ? (
+                allMaterials.map((material) => {
+                  return (
+                    <Table.Row
+                      className="bg-white dark:border-gray-700 dark:bg-gray-800"
+                      key={material?._id}
+                    >
+                      <Table.Cell className="p-4">
+                        <Checkbox />
+                      </Table.Cell>
+                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                        {material?.name}
+                      </Table.Cell>
+                      <Table.Cell>2</Table.Cell>
+                      <Table.Cell>Active</Table.Cell>
+                      <Table.Cell>Edit</Table.Cell>
+                    </Table.Row>
+                  );
+                })
+              ) : (
+                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                  <Table.Cell className="p-4" colSpan={5}>
+                    <Checkbox />
+                  </Table.Cell>
+                </Table.Row>
+              )}
             </Table.Body>
           </Table>
         </div>

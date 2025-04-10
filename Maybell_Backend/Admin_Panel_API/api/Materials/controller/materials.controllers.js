@@ -6,8 +6,6 @@ exports.create = async (req, res) => {
   try {
     const { name, order } = req.body;
 
-    console.log(req.body);
-
     let lastOrderValue = 0;
 
     if (!order) {
