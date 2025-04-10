@@ -121,8 +121,8 @@ export const MaterialTableListing = ({ allMaterials, setAllMaterials }) => {
                 })
               ) : (
                 <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                  <Table.Cell className="p-4" colSpan={5}>
-                    <Checkbox />
+                  <Table.Cell className="p-4" colSpan="5">
+                    <p className="text-center">No records found!</p>
                   </Table.Cell>
                 </Table.Row>
               )}
