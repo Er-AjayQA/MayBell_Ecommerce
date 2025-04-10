@@ -4,16 +4,21 @@ const MaterialsModel = require("../model/materials.model");
 // Create New Material
 exports.create = async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, order } = req.body;
 
-    const getAllData = await MaterialsModel.find();
+    console.log(req.body);
 
     let lastOrderValue = 0;
-    if (getAllData.length >= 1) {
-      lastOrderValue = getAllData[getAllData.length - 1].order;
+
+    if (!order) {
+      const getAllData = await MaterialsModel.find();
+
+      if (getAllData.length >= 1) {
+        lastOrderValue = getAllData[getAllData.length - 1].order;
+      }
     }
 
-    const data = { name, order: lastOrderValue + 1 };
+    const data = { name, order: order ? order : lastOrderValue + 1 };
 
     const createMaterial = await MaterialsModel.create(data);
     await createMaterial.save();

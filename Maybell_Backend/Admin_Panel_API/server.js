@@ -2,6 +2,7 @@
 const express = require("express");
 require("dotenv").config();
 const app = express();
+const cors = require("cors");
 const PORT = process.env.PORT || 5000;
 const DBConnection = require("./config/db.config");
 
@@ -16,6 +17,14 @@ const whyChooseUsRoutes = require("./api/WhyChooseUs/router/whyChooseUs.router")
 const couponsRoutes = require("./api/Coupons/router/coupons.router");
 
 // Using Middlewares
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    methods: ["GET", "POST", "DELETE", "PUT"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

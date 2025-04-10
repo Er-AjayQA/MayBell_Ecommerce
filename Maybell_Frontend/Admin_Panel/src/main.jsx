@@ -59,10 +59,10 @@ createRoot(document.getElementById("root")).render(
               path="/furniture/admin-panel/categories"
               element={<Categories />}
             />
-            <Route
-              path="/furniture/admin-panel/materials"
-              element={<Materials />}
-            />
+            <Route path="/furniture/admin-panel/materials">
+              <Route path="create" element={<Materials />} />
+            </Route>
+
             <Route path="/furniture/admin-panel/colors" element={<Colors />} />
             <Route
               path="/furniture/admin-panel/products"
