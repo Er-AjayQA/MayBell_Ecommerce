@@ -36,16 +36,13 @@ export const Materials = () => {
 
   // Get All Existing Materials
   const getAllMaterialsData = async () => {
-    let formData = { name: "" };
-    const response = await getAllMaterials(formData);
+    const response = await getAllMaterials(filterData);
     setAllMaterials(response.data);
   };
 
   useEffect(() => {
     getAllMaterialsData();
-  }, []);
-
-  console.log(allMaterials);
+  }, [allMaterials, filterData]);
 
   return (
     <>
@@ -96,10 +93,7 @@ export const Materials = () => {
         {/* Filter Section End */}
 
         {/* Table Section Start */}
-        <MaterialTableListing
-          allMaterials={allMaterials}
-          setAllMaterials={setAllMaterials}
-        />
+        <MaterialTableListing allMaterials={allMaterials} />
         {/* Table Section End */}
 
         {/* Create Form Start */}

@@ -42,13 +42,14 @@ exports.getAll = async (req, res) => {
     let page = parseInt(req?.body?.page) || 1;
     if (limit < 1) limit = 15;
     if (page < 1) page = 1;
+    const { name } = req.body;
 
     let skip = (page - 1) * limit;
 
     const filter = { deletedAt: null };
 
-    if (req.body.name != "" && req.body.name != undefined) {
-      var nameRegex = new RegExp(req.body.name, "i");
+    if (name != "" && name != undefined) {
+      var nameRegex = new RegExp(name, "i");
       filter.name = nameRegex;
     }
 

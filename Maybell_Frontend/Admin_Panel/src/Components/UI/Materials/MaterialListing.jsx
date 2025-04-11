@@ -1,12 +1,38 @@
 import { Table, Checkbox, Tooltip } from "flowbite-react";
+import { useEffect, useState } from "react";
 import { AiOutlineSwap } from "react-icons/ai";
 import { FaFilePdf } from "react-icons/fa";
 import { GrDocumentCsv } from "react-icons/gr";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { TbArrowsSort } from "react-icons/tb";
+import { getAllMaterials } from "../../../Services";
 
-export const MaterialTableListing = ({ allMaterials, setAllMaterials }) => {
-  console.log(allMaterials);
+export const MaterialTableListing = ({ allMaterials }) => {
+  const [selectedRecords, setSelectedRecords] = useState([]);
+
+  // Handle Checkbox Check
+  const handleCheckboxSelection = (id) => {
+    setSelectedRecords((prev) => {
+      if (prev.includes(id)) {
+        let data = prev.filter((record) => record !== id);
+        return data;
+      } else {
+        return [...prev, id];
+      }
+    });
+  };
+
+  // Handle Select All Checkboxes
+  const handleSelectAllCheckboxes = (event) => {
+    if (event.target.checked) {
+      const data = allMaterials.map((material) => {
+        return material._id;
+      });
+      setSelectedRecords(data);
+    } else {
+      setSelectedRecords([]);
+    }
+  };
 
   return (
     <>
@@ -92,7 +118,15 @@ export const MaterialTableListing = ({ allMaterials, setAllMaterials }) => {
           <Table hoverable>
             <Table.Head>
               <Table.HeadCell className="p-4">
-                <Checkbox />
+                <Checkbox
+                  defaultChecked="false"
+                  onChange={handleSelectAllCheckboxes}
+                  checked={
+                    selectedRecords.length === allMaterials.length
+                      ? "checked"
+                      : ""
+                  }
+                />
               </Table.HeadCell>
               <Table.HeadCell>Name</Table.HeadCell>
               <Table.HeadCell>Order</Table.HeadCell>
@@ -108,7 +142,15 @@ export const MaterialTableListing = ({ allMaterials, setAllMaterials }) => {
                       key={material?._id}
                     >
                       <Table.Cell className="p-4">
-                        <Checkbox />
+                        <Checkbox
+                          defaultChecked="false"
+                          onClick={() => handleCheckboxSelection(material?._id)}
+                          checked={
+                            selectedRecords.includes(material?._id)
+                              ? "checked"
+                              : ""
+                          }
+                        />
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                         {material?.name}
