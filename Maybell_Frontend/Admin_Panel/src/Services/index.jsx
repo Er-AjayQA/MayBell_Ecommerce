@@ -14,5 +14,6 @@ export const getAllMaterials = async (formData) => {
 
 // Change Status of Materials Service
 export const changeMaterialsStatus = async (formData) => {
-  await axiosInstance.put("/materials/update-status", formData);
+  const data = await axiosInstance.put("/materials/update-status", formData);
+  return data;
 };

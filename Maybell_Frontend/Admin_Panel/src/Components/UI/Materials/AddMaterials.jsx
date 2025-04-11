@@ -18,7 +18,10 @@ export const AddMaterials = ({
     const response = await createMaterials(data);
     if (response.success) {
       toast.success(response.message);
-      setOpenCreateForm();
+      setOpenCreateForm(false);
+      reset();
+    } else if (!response.success) {
+      toast.error(response.message);
     }
   };
 

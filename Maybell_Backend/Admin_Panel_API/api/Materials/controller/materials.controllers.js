@@ -9,7 +9,7 @@ exports.create = async (req, res) => {
     let lastOrderValue = 0;
 
     if (!order) {
-      const getAllData = await MaterialsModel.find();
+      const getAllData = await MaterialsModel.find().sort({ order: 1 });
 
       if (getAllData.length >= 1) {
         lastOrderValue = getAllData[getAllData.length - 1].order;
@@ -137,9 +137,9 @@ exports.update = async (req, res) => {
 // Change Status
 exports.updateStatus = async (req, res) => {
   try {
-    const { ids } = req.body;
+    const { id } = req.body;
 
-    const updateData = await MaterialsModel.updateMany({ _id: { $in: ids } }, [
+    const updateData = await MaterialsModel.updateOne({ _id: id }, [
       { $set: { status: { $not: "$status" } } },
     ]);
 

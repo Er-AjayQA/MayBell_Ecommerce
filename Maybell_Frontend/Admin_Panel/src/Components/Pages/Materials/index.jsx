@@ -93,7 +93,11 @@ export const Materials = () => {
         {/* Filter Section End */}
 
         {/* Table Section Start */}
-        <MaterialTableListing allMaterials={allMaterials} />
+        <MaterialTableListing
+          allMaterials={allMaterials}
+          setAllMaterials={setAllMaterials}
+          filterData={filterData}
+        />
         {/* Table Section End */}
 
         {/* Create Form Start */}

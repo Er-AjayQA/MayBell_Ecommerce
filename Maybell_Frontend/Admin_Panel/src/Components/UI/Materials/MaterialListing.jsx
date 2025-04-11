@@ -6,10 +6,10 @@ import { GrDocumentCsv } from "react-icons/gr";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { TbArrowsSort } from "react-icons/tb";
 import { changeMaterialsStatus } from "../../../Services";
+import { useNavigate } from "react-router-dom";
 
 export const MaterialTableListing = ({ allMaterials }) => {
   const [selectedRecords, setSelectedRecords] = useState([]);
-  const [statusButtonId, setStatusButtonId] = useState([]);
 
   // Handle Checkbox Check
   const handleCheckboxSelection = (id) => {
@@ -35,28 +35,14 @@ export const MaterialTableListing = ({ allMaterials }) => {
     }
   };
 
-  // Handle Status Button Status
-  const handleStatusButton = (id) => {
-    setStatusButtonId((prev) => {
-      if (prev.includes(id)) {
-        let data = prev.filter((materialId) => materialId !== id);
-        return data;
-      } else {
-        return [...prev, id];
-      }
-    });
-  };
-
   // Change Status of Materials
-  const changeStatus = async () => {
-    await changeMaterialsStatus(statusButtonId);
+  const handleStatusChange = async (id) => {
+    const response = await changeMaterialsStatus({ id });
+
+    if (response.success) {
+      toast.success(response.message);
+    }
   };
-
-  useEffect(() => {
-    changeStatus();
-  }, [statusButtonId]);
-
-  console.log(statusButtonId);
 
   return (
     <>
@@ -146,6 +132,7 @@ export const MaterialTableListing = ({ allMaterials }) => {
                   defaultChecked="false"
                   onChange={handleSelectAllCheckboxes}
                   checked={
+                    allMaterials.length >= 1 &&
                     selectedRecords.length === allMaterials.length
                       ? "checked"
                       : ""
@@ -160,7 +147,6 @@ export const MaterialTableListing = ({ allMaterials }) => {
             <Table.Body className="divide-y">
               {allMaterials?.length >= 1 ? (
                 allMaterials.map((material) => {
-                  const isActive = statusButtonId.includes(material?._id);
                   return (
                     <Table.Row
                       className="bg-white dark:border-gray-700 dark:bg-gray-800"
@@ -180,20 +166,19 @@ export const MaterialTableListing = ({ allMaterials }) => {
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                         {material?.name}
                       </Table.Cell>
-                      <Table.Cell>2</Table.Cell>
+                      <Table.Cell>{material?.order}</Table.Cell>
                       <Table.Cell>
                         <div
-                          className={`relative w-[50px] h-[20px] border-solid border-1 border-[#ccc]  shadow-md rounded-[50px] cursor-pointer ${
-                            material?.status ? "bg-green-500" : "bg-red-500"
-                          } transition-all duration-400 ease-in-out`}
-                          onClick={() => handleStatusButton(material?._id)}
+                          div
+                          className={`w-[60px] h-[25px] border border-gray-300 shadow-inner rounded-full cursor-pointer flex items-center transition-colors duration-300 ${
+                            material?.status
+                              ? "bg-green-400 justify-end"
+                              : "bg-red-400 justify-start"
+                          }`}
+                          onClick={() => handleStatusChange(material?._id)}
                         >
                           <span
-                            className={`absolute top-[50%] translate-y-[-50%] border-solid border-1 border-[#0000ff] block w-[18px] h-[18px] bg-[#0000ff] rounded-full ${
-                              material?.status
-                                ? "translate-x-8"
-                                : "translate-x-0"
-                            } transition-all duration-400 ease-in-out`}
+                            className={`w-[24px] h-[24px] bg-white rounded-full shadow-md transform transition-transform duration-300`}
                           ></span>
                         </div>
                       </Table.Cell>
