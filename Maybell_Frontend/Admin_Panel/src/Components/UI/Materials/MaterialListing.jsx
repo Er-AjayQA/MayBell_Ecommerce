@@ -56,6 +56,8 @@ export const MaterialTableListing = ({ allMaterials }) => {
     changeStatus();
   }, [statusButtonId]);
 
+  console.log(statusButtonId);
+
   return (
     <>
       {/* Table Section Start */}
@@ -182,13 +184,15 @@ export const MaterialTableListing = ({ allMaterials }) => {
                       <Table.Cell>
                         <div
                           className={`relative w-[50px] h-[20px] border-solid border-1 border-[#ccc]  shadow-md rounded-[50px] cursor-pointer ${
-                            isActive ? "bg-green-500" : "bg-red-500"
+                            material?.status ? "bg-green-500" : "bg-red-500"
                           } transition-all duration-400 ease-in-out`}
                           onClick={() => handleStatusButton(material?._id)}
                         >
                           <span
                             className={`absolute top-[50%] translate-y-[-50%] border-solid border-1 border-[#0000ff] block w-[18px] h-[18px] bg-[#0000ff] rounded-full ${
-                              isActive ? "translate-x-8" : "translate-x-0"
+                              material?.status
+                                ? "translate-x-8"
+                                : "translate-x-0"
                             } transition-all duration-400 ease-in-out`}
                           ></span>
                         </div>
