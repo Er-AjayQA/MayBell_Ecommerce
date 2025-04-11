@@ -42,7 +42,7 @@ export const Materials = () => {
 
   useEffect(() => {
     getAllMaterialsData();
-  }, [allMaterials, filterData]);
+  }, [filterData]);
 
   return (
     <>
