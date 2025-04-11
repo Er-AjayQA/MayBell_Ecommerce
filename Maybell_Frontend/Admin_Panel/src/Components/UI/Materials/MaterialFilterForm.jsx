@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { IoMdSearch } from "react-icons/io";
 
 export const MaterialFilterForm = ({
@@ -6,7 +5,6 @@ export const MaterialFilterForm = ({
   filterData,
   filterFormData,
   filterFormReset,
-  setFilterData,
 }) => {
   return (
     <>

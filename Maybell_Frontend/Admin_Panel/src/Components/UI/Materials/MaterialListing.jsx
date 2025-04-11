@@ -5,10 +5,11 @@ import { FaFilePdf } from "react-icons/fa";
 import { GrDocumentCsv } from "react-icons/gr";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { TbArrowsSort } from "react-icons/tb";
-import { getAllMaterials } from "../../../Services";
+import { changeMaterialsStatus } from "../../../Services";
 
 export const MaterialTableListing = ({ allMaterials }) => {
   const [selectedRecords, setSelectedRecords] = useState([]);
+  const [statusButtonId, setStatusButtonId] = useState([]);
 
   // Handle Checkbox Check
   const handleCheckboxSelection = (id) => {
@@ -33,6 +34,27 @@ export const MaterialTableListing = ({ allMaterials }) => {
       setSelectedRecords([]);
     }
   };
+
+  // Handle Status Button Status
+  const handleStatusButton = (id) => {
+    setStatusButtonId((prev) => {
+      if (prev.includes(id)) {
+        let data = prev.filter((materialId) => materialId !== id);
+        return data;
+      } else {
+        return [...prev, id];
+      }
+    });
+  };
+
+  // Change Status of Materials
+  const changeStatus = async () => {
+    await changeMaterialsStatus(statusButtonId);
+  };
+
+  useEffect(() => {
+    changeStatus();
+  }, [statusButtonId]);
 
   return (
     <>
@@ -136,6 +158,7 @@ export const MaterialTableListing = ({ allMaterials }) => {
             <Table.Body className="divide-y">
               {allMaterials?.length >= 1 ? (
                 allMaterials.map((material) => {
+                  const isActive = statusButtonId.includes(material?._id);
                   return (
                     <Table.Row
                       className="bg-white dark:border-gray-700 dark:bg-gray-800"
@@ -156,7 +179,20 @@ export const MaterialTableListing = ({ allMaterials }) => {
                         {material?.name}
                       </Table.Cell>
                       <Table.Cell>2</Table.Cell>
-                      <Table.Cell>Active</Table.Cell>
+                      <Table.Cell>
+                        <div
+                          className={`relative w-[50px] h-[20px] border-solid border-1 border-[#ccc]  shadow-md rounded-[50px] cursor-pointer ${
+                            isActive ? "bg-green-500" : "bg-red-500"
+                          } transition-all duration-400 ease-in-out`}
+                          onClick={() => handleStatusButton(material?._id)}
+                        >
+                          <span
+                            className={`absolute top-[50%] translate-y-[-50%] border-solid border-1 border-[#0000ff] block w-[18px] h-[18px] bg-[#0000ff] rounded-full ${
+                              isActive ? "translate-x-8" : "translate-x-0"
+                            } transition-all duration-400 ease-in-out`}
+                          ></span>
+                        </div>
+                      </Table.Cell>
                       <Table.Cell>Edit</Table.Cell>
                     </Table.Row>
                   );

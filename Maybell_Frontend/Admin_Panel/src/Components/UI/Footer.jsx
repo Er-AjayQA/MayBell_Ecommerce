@@ -8,7 +8,7 @@ export const Footer = () => {
   return (
     <>
       <section
-        className={`p-[20px] flex justify-between fixed bottom-0 end-0 ${
+        className={`p-[20px] flex justify-between fixed bottom-0 end-0 bg-white ${
           isMenuOpen ? "start-[15%]" : "start-[8%]"
         } transition-all duration-[.4s] ease-linear`}
       >
