@@ -8,12 +8,28 @@ exports.create = async (req, res) => {
 
     let lastOrderValue = 0;
 
-    if (!order) {
-      const getAllData = await MaterialsModel.find().sort({ order: 1 });
+    // Get count to handle empty collection case
+    const materialsCount = await MaterialsModel.countDocuments({
+      deletedAt: null,
+    });
 
-      if (getAllData.length >= 1) {
-        lastOrderValue = getAllData[getAllData.length - 1].order;
-      }
+    if (!order && materialsCount > 0) {
+      const lastMaterial = await MaterialsModel.findOne({ deletedAt: null })
+        .sort({ order: -1 })
+        .limit(1);
+      lastOrderValue = lastMaterial.order;
+    }
+
+    const materialExist = await MaterialsModel.findOne({
+      $or: [{ name }, { order: order || lastOrderValue + 1 }],
+      deletedAt: null,
+    });
+
+    if (materialExist) {
+      return res.status(409).json({
+        success: false,
+        message: "Material name || order already exists!!",
+      });
     }
 
     const data = { name, order: order ? order : lastOrderValue + 1 };

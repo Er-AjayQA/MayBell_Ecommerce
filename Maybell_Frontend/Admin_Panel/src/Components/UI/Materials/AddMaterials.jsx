@@ -7,6 +7,7 @@ export const AddMaterials = ({
   openCreateForm,
   setOpenCreateForm,
   createForm,
+  getAllMaterialsData,
 }) => {
   const {
     register,
@@ -16,10 +17,13 @@ export const AddMaterials = ({
 
   const onSubmit = async (data) => {
     const response = await createMaterialsService(data);
+    console.log(response);
+
     if (response.success) {
       toast.success(response.message);
       setOpenCreateForm(false);
-      reset();
+      // data.reset();
+      getAllMaterialsData();
     } else if (!response.success) {
       toast.error(response.message);
     }
@@ -72,7 +76,7 @@ export const AddMaterials = ({
                   Order
                 </label>
                 <input
-                  type="text"
+                  type="number"
                   id="order"
                   {...register("order")}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"

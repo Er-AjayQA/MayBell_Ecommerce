@@ -20,6 +20,6 @@ export const changeMaterialsStatusService = async (formData) => {
 
 // Delete Materials Service
 export const deleteMaterialService = async (formData) => {
-  const data = await axiosInstance.put("/materials/update-status", formData);
+  const data = await axiosInstance.put("/materials/delete", formData);
   return data.data;
 };

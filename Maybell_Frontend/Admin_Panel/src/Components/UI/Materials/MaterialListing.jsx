@@ -7,7 +7,10 @@ import { GrDocumentCsv } from "react-icons/gr";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { TbArrowsSort } from "react-icons/tb";
 import { toast } from "react-toastify";
-import { changeMaterialsStatusService } from "../../../Services/MaterialServices";
+import {
+  changeMaterialsStatusService,
+  deleteMaterialService,
+} from "../../../Services/MaterialServices";
 
 export const MaterialTableListing = ({ allMaterials, getAllMaterialsData }) => {
   const [selectedRecords, setSelectedRecords] = useState([]);
@@ -40,6 +43,16 @@ export const MaterialTableListing = ({ allMaterials, getAllMaterialsData }) => {
   const handleStatusChange = async (id) => {
     const response = await changeMaterialsStatusService({ id });
     console.log(response.message);
+
+    if (response.success) {
+      toast.success(response.message);
+      getAllMaterialsData();
+    }
+  };
+
+  // Handle Delete Materials
+  const handleDeleteMaterials = async (id) => {
+    const response = await deleteMaterialService({ id });
 
     if (response.success) {
       toast.success(response.message);
@@ -189,7 +202,10 @@ export const MaterialTableListing = ({ allMaterials, getAllMaterialsData }) => {
                           <button className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-green-400 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out">
                             <MdEdit />
                           </button>
-                          <button className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-red-600 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out">
+                          <button
+                            className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-red-600 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out"
+                            onClick={() => handleDeleteMaterials(material?._id)}
+                          >
                             <MdDeleteForever />
                           </button>
                         </div>

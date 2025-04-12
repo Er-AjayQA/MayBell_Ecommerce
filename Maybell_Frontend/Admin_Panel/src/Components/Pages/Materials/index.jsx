@@ -106,6 +106,7 @@ export const Materials = () => {
           openCreateForm={openCreateForm}
           setOpenCreateForm={setOpenCreateForm}
           createForm={handleCreateFormVisibility}
+          getAllMaterialsData={getAllMaterialsData}
         />
         {/* Create Form End */}
       </section>
