@@ -160,10 +160,10 @@ exports.updateStatus = async (req, res) => {
 // Delete Materials By Ids
 exports.delete = async (req, res) => {
   try {
-    const { ids } = req.body;
+    const { id } = req.body;
 
-    const deleteData = await MaterialsModel.updateMany(
-      { _id: { $in: ids } },
+    const deleteData = await MaterialsModel.updateOne(
+      { _id: id },
       { $set: { deletedAt: Date.now() } }
     );
 

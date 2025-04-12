@@ -1,14 +1,15 @@
 import { Table, Checkbox, Tooltip } from "flowbite-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AiOutlineSwap } from "react-icons/ai";
 import { FaFilePdf } from "react-icons/fa";
+import { MdDeleteForever, MdEdit } from "react-icons/md";
 import { GrDocumentCsv } from "react-icons/gr";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { TbArrowsSort } from "react-icons/tb";
-import { changeMaterialsStatus } from "../../../Services";
-import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { changeMaterialsStatusService } from "../../../Services/MaterialServices";
 
-export const MaterialTableListing = ({ allMaterials }) => {
+export const MaterialTableListing = ({ allMaterials, getAllMaterialsData }) => {
   const [selectedRecords, setSelectedRecords] = useState([]);
 
   // Handle Checkbox Check
@@ -37,10 +38,12 @@ export const MaterialTableListing = ({ allMaterials }) => {
 
   // Change Status of Materials
   const handleStatusChange = async (id) => {
-    const response = await changeMaterialsStatus({ id });
+    const response = await changeMaterialsStatusService({ id });
+    console.log(response.message);
 
     if (response.success) {
       toast.success(response.message);
+      getAllMaterialsData();
     }
   };
 
@@ -124,9 +127,9 @@ export const MaterialTableListing = ({ allMaterials }) => {
         {/* Table Form UI End */}
 
         {/* Table Listing Start */}
-        <div className="overflow-x-auto rounded-lg border border-gray-200">
+        <div className="overflow-y-scroll max-h-[20%] overflow-hidden rounded-lg border border-gray-200">
           <Table hoverable>
-            <Table.Head>
+            <Table.Head className="text-center">
               <Table.HeadCell className="p-4">
                 <Checkbox
                   defaultChecked="false"
@@ -149,7 +152,7 @@ export const MaterialTableListing = ({ allMaterials }) => {
                 allMaterials.map((material) => {
                   return (
                     <Table.Row
-                      className="bg-white dark:border-gray-700 dark:bg-gray-800"
+                      className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center"
                       key={material?._id}
                     >
                       <Table.Cell className="p-4">
@@ -169,8 +172,7 @@ export const MaterialTableListing = ({ allMaterials }) => {
                       <Table.Cell>{material?.order}</Table.Cell>
                       <Table.Cell>
                         <div
-                          div
-                          className={`w-[60px] h-[25px] border border-gray-300 shadow-inner rounded-full cursor-pointer flex items-center transition-colors duration-300 ${
+                          className={`w-[50px] h-[23px] border border-gray-300 m-auto shadow-inner rounded-full cursor-pointer flex items-center transition-colors duration-300 ${
                             material?.status
                               ? "bg-green-400 justify-end"
                               : "bg-red-400 justify-start"
@@ -178,11 +180,20 @@ export const MaterialTableListing = ({ allMaterials }) => {
                           onClick={() => handleStatusChange(material?._id)}
                         >
                           <span
-                            className={`w-[24px] h-[24px] bg-white rounded-full shadow-md transform transition-transform duration-300`}
+                            className={`w-[24px] h-[22px] bg-white rounded-full shadow-md transform transition-transform duration-300`}
                           ></span>
                         </div>
                       </Table.Cell>
-                      <Table.Cell>Edit</Table.Cell>
+                      <Table.Cell>
+                        <div className="flex justify-center items-center gap-2">
+                          <button className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-green-400 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out">
+                            <MdEdit />
+                          </button>
+                          <button className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-red-600 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out">
+                            <MdDeleteForever />
+                          </button>
+                        </div>
+                      </Table.Cell>
                     </Table.Row>
                   );
                 })

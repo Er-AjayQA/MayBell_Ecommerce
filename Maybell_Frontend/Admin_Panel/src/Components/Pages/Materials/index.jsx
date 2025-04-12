@@ -5,7 +5,7 @@ import { BreadCrumb } from "../../UI/Breadcrumb";
 import { AddMaterials } from "../../UI/Materials/AddMaterials";
 import { MaterialFilterForm } from "../../UI/Materials/MaterialFilterForm";
 import { MaterialTableListing } from "../../UI/Materials/MaterialListing";
-import { getAllMaterials } from "../../../Services";
+import { getAllMaterialsService } from "../../../Services/MaterialServices";
 
 export const Materials = () => {
   const [openCreateForm, setOpenCreateForm] = useState(false);
@@ -36,7 +36,7 @@ export const Materials = () => {
 
   // Get All Existing Materials
   const getAllMaterialsData = async () => {
-    const response = await getAllMaterials(filterData);
+    const response = await getAllMaterialsService(filterData);
     setAllMaterials(response.data);
   };
 
@@ -97,6 +97,7 @@ export const Materials = () => {
           allMaterials={allMaterials}
           setAllMaterials={setAllMaterials}
           filterData={filterData}
+          getAllMaterialsData={getAllMaterialsData}
         />
         {/* Table Section End */}
 

@@ -1,7 +1,7 @@
 import { IoClose } from "react-icons/io5";
 import { useForm } from "react-hook-form";
-import { createMaterials } from "../../../Services";
 import { toast } from "react-toastify";
+import { createMaterialsService } from "../../../Services/MaterialServices";
 
 export const AddMaterials = ({
   openCreateForm,
@@ -15,7 +15,7 @@ export const AddMaterials = ({
   } = useForm();
 
   const onSubmit = async (data) => {
-    const response = await createMaterials(data);
+    const response = await createMaterialsService(data);
     if (response.success) {
       toast.success(response.message);
       setOpenCreateForm(false);
