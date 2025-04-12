@@ -212,7 +212,7 @@ export const MaterialTableListing = ({
                       <Table.Cell>{material?.order}</Table.Cell>
                       <Table.Cell>
                         <div
-                          className={`w-[50px] h-[23px] border border-gray-300 m-auto shadow-inner rounded-full cursor-pointer flex items-center transition-colors duration-300 ${
+                          className={`w-[50px] h-[20px] border border-gray-300 m-auto shadow-md rounded-full cursor-pointer flex items-center transition-colors duration-300 ${
                             material?.status
                               ? "bg-green-400 justify-end"
                               : "bg-red-400 justify-start"
@@ -220,7 +220,7 @@ export const MaterialTableListing = ({
                           onClick={() => handleStatusChange(material?._id)}
                         >
                           <span
-                            className={`w-[24px] h-[22px] bg-white rounded-full shadow-md transform transition-transform duration-300`}
+                            className={`w-[24px] h-[18px] bg-white border-solid border-[1px] border-black rounded-full shadow-inner transform transition-transform duration-300`}
                           ></span>
                         </div>
                       </Table.Cell>
