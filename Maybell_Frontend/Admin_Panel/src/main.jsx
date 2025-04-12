@@ -61,6 +61,8 @@ createRoot(document.getElementById("root")).render(
             />
             <Route path="/furniture/admin-panel/">
               <Route path="materials" element={<Materials />} />
+              <Route path="materials/create" element={<Materials />} />
+              <Route path="materials/update/:id" element={<Materials />} />
             </Route>
 
             <Route path="/furniture/admin-panel/colors" element={<Colors />} />

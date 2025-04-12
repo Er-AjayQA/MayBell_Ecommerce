@@ -7,7 +7,7 @@ export const MainLayout = () => {
   return (
     <>
       <div className="relative">
-        <ToastContainer />
+        <ToastContainer autoClose={1000} />
         <Header />
         <SideBarMenu />
         <Outlet />

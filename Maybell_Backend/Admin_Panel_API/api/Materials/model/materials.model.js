@@ -6,7 +6,6 @@ const MaterialsSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    unique: true,
   },
   order: { type: Number, min: 1, max: 10000, default: 1 },
   status: {

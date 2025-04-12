@@ -10,9 +10,17 @@ import { toast } from "react-toastify";
 import {
   changeMaterialsStatusService,
   deleteMaterialService,
+  deleteMultipleMaterialService,
 } from "../../../Services/MaterialServices";
+import { Link } from "react-router-dom";
 
-export const MaterialTableListing = ({ allMaterials, getAllMaterialsData }) => {
+export const MaterialTableListing = ({
+  allMaterials,
+  getAllMaterialsData,
+  filterData,
+  filterFormData,
+  handleUpdateId,
+}) => {
   const [selectedRecords, setSelectedRecords] = useState([]);
 
   // Handle Checkbox Check
@@ -42,7 +50,6 @@ export const MaterialTableListing = ({ allMaterials, getAllMaterialsData }) => {
   // Change Status of Materials
   const handleStatusChange = async (id) => {
     const response = await changeMaterialsStatusService({ id });
-    console.log(response.message);
 
     if (response.success) {
       toast.success(response.message);
@@ -57,6 +64,20 @@ export const MaterialTableListing = ({ allMaterials, getAllMaterialsData }) => {
     if (response.success) {
       toast.success(response.message);
       getAllMaterialsData();
+    }
+  };
+
+  // Handle Delete Multiple Data
+  const handleDeleteMultipleMaterials = async () => {
+    const response = await deleteMultipleMaterialService({
+      ids: selectedRecords,
+    });
+
+    if (response.success) {
+      toast.success(response.message);
+      getAllMaterialsData();
+    } else {
+      toast.error(response.message);
     }
   };
 
@@ -96,9 +117,11 @@ export const MaterialTableListing = ({ allMaterials, getAllMaterialsData }) => {
                 </label>
                 <input
                   type="search"
+                  name="name"
                   id="default-search"
+                  value={filterData.name}
                   className="block py-1 px-3 text-sm text-gray-600 border rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                  required
+                  onChange={(event) => filterFormData(event)}
                 />
               </div>
             </form>
@@ -108,27 +131,30 @@ export const MaterialTableListing = ({ allMaterials, getAllMaterialsData }) => {
           {/* Right Form Start */}
           <div className="rightForm">
             <div className="flex gap-1">
-              <Tooltip content="Reorder" placement="bottom">
+              <Tooltip content="Reorder" placement="top">
                 <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200">
                   <AiOutlineSwap />
                 </button>
               </Tooltip>
-              <Tooltip content="Delete Selected" placement="bottom">
-                <button className="p-2 text-red-500 hover:bg-gray-100 rounded-lg border border-gray-200">
+              <Tooltip content="Delete Selected" placement="top">
+                <button
+                  className="p-2 text-red-500 hover:bg-gray-100 rounded-lg border border-gray-200"
+                  onClick={handleDeleteMultipleMaterials}
+                >
                   <RiDeleteBin5Fill />
                 </button>
               </Tooltip>
-              <Tooltip content="Save Order" placement="bottom">
+              <Tooltip content="Save Order" placement="top">
                 <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200">
                   <TbArrowsSort />
                 </button>
               </Tooltip>
-              <Tooltip content="Download CSV" placement="bottom">
+              <Tooltip content="Download CSV" placement="top">
                 <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200">
                   <GrDocumentCsv />
                 </button>
               </Tooltip>
-              <Tooltip content="Download PDF" placement="bottom">
+              <Tooltip content="Download PDF" placement="top">
                 <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200">
                   <FaFilePdf />
                 </button>
@@ -140,9 +166,9 @@ export const MaterialTableListing = ({ allMaterials, getAllMaterialsData }) => {
         {/* Table Form UI End */}
 
         {/* Table Listing Start */}
-        <div className="overflow-y-scroll max-h-[20%] overflow-hidden rounded-lg border border-gray-200">
-          <Table hoverable>
-            <Table.Head className="text-center">
+        <div className="overflow-y-auto h-[350px] rounded-lg border border-gray-200">
+          <Table hoverable className="w-full">
+            <Table.Head className="text-center sticky top-0 bg-white z-10">
               <Table.HeadCell className="p-4">
                 <Checkbox
                   defaultChecked="false"
@@ -160,7 +186,8 @@ export const MaterialTableListing = ({ allMaterials, getAllMaterialsData }) => {
               <Table.HeadCell>Status</Table.HeadCell>
               <Table.HeadCell>Action</Table.HeadCell>
             </Table.Head>
-            <Table.Body className="divide-y">
+
+            <Table.Body className="divide-y ">
               {allMaterials?.length >= 1 ? (
                 allMaterials.map((material) => {
                   return (
@@ -199,9 +226,13 @@ export const MaterialTableListing = ({ allMaterials, getAllMaterialsData }) => {
                       </Table.Cell>
                       <Table.Cell>
                         <div className="flex justify-center items-center gap-2">
-                          <button className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-green-400 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out">
+                          <Link
+                            to={`/furniture/admin-panel/materials/update/${material?._id}`}
+                            className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-green-400 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out"
+                            onClick={() => handleUpdateId(material?._id)}
+                          >
                             <MdEdit />
-                          </button>
+                          </Link>
                           <button
                             className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-red-600 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out"
                             onClick={() => handleDeleteMaterials(material?._id)}

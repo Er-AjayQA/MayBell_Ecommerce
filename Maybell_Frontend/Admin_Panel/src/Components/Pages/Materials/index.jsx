@@ -5,13 +5,20 @@ import { BreadCrumb } from "../../UI/Breadcrumb";
 import { AddMaterials } from "../../UI/Materials/AddMaterials";
 import { MaterialFilterForm } from "../../UI/Materials/MaterialFilterForm";
 import { MaterialTableListing } from "../../UI/Materials/MaterialListing";
-import { getAllMaterialsService } from "../../../Services/MaterialServices";
+import {
+  getAllMaterialsService,
+  getMaterialsDetailById,
+} from "../../../Services/MaterialServices";
+import { Link } from "react-router-dom";
 
 export const Materials = () => {
   const [openCreateForm, setOpenCreateForm] = useState(false);
   const [filterFormStatus, setFilterFormStatus] = useState(false);
   const [filterData, setFilterData] = useState({ name: "" });
   const [allMaterials, setAllMaterials] = useState([]);
+  const [updateId, setUpdateId] = useState(null);
+  const [materialDetails, setMaterialDetails] = useState([]);
+  const [updateIdState, setUpdateIdState] = useState(false);
 
   // Handle Create Form Visibility
   const handleCreateFormVisibility = () => {
@@ -40,9 +47,38 @@ export const Materials = () => {
     setAllMaterials(response.data);
   };
 
+  // Handle Set Update Id
+  const handleUpdateId = (id) => {
+    handleCreateFormVisibility();
+    setUpdateId((prev) => {
+      if (!id) {
+        return (prev = null);
+      } else {
+        return (prev = id);
+      }
+    });
+  };
+
+  // Get Material Detail
+  const getMaterialById = async () => {
+    const response = await getMaterialsDetailById(updateId);
+    if (response.success) {
+      setMaterialDetails(response.data);
+    }
+  };
+
   useEffect(() => {
     getAllMaterialsData();
   }, [filterData]);
+
+  useEffect(() => {
+    if (updateId === null) {
+      setUpdateIdState(false);
+    } else {
+      setUpdateIdState(true);
+      getMaterialById();
+    }
+  }, [updateId]);
 
   return (
     <>
@@ -56,12 +92,12 @@ export const Materials = () => {
           {/* Action Buttons Start */}
           <div className="basis-2/4 text-right">
             <div className="flex items-center justify-end gap-3">
-              <button className="w-[2.5rem] h-[2.5rem] p-1 rounded-[50%] bg-[#3e8ef7] flex items-center justify-center  shadow-lg transition-all duration-1000 ease-in-out hover:shadow-sm hover:bg-[#589FFC]">
+              <button
+                className="w-[2.5rem] h-[2.5rem] p-1 rounded-[50%] bg-[#3e8ef7] flex items-center justify-center  shadow-lg transition-all duration-1000 ease-in-out hover:shadow-sm hover:bg-[#589FFC]"
+                onClick={handleFilterFormVisibility}
+              >
                 {!filterFormStatus ? (
-                  <FaFilter
-                    className="text-white text-[1rem]"
-                    onClick={handleFilterFormVisibility}
-                  />
+                  <FaFilter className="text-white text-[1rem]" />
                 ) : (
                   <MdFilterAltOff
                     className="text-white text-[1rem]"
@@ -69,12 +105,13 @@ export const Materials = () => {
                   />
                 )}
               </button>
-              <button
+              <Link
+                to={"/furniture/admin-panel/materials/create"}
                 className="w-[2.5rem] h-[2.5rem] p-1 rounded-[50%] bg-[#3e8ef7] flex items-center justify-center shadow-lg transition-all duration-1000 ease-in-out hover:shadow-sm hover:bg-[#589FFC]"
                 onClick={handleCreateFormVisibility}
               >
                 <FaPlus className="text-white text-[1rem]" />
-              </button>
+              </Link>
             </div>
           </div>
           {/* Action Buttons End */}
@@ -84,9 +121,7 @@ export const Materials = () => {
         {/* Filter Section Start */}
         <MaterialFilterForm
           filterFormStatus={filterFormStatus}
-          setFilterFormStatus={setFilterFormStatus}
           filterData={filterData}
-          setFilterData={setFilterData}
           filterFormData={handleFilterData}
           filterFormReset={handleClearFilterForm}
         />
@@ -95,18 +130,21 @@ export const Materials = () => {
         {/* Table Section Start */}
         <MaterialTableListing
           allMaterials={allMaterials}
-          setAllMaterials={setAllMaterials}
           filterData={filterData}
           getAllMaterialsData={getAllMaterialsData}
+          filterFormData={handleFilterData}
+          handleUpdateId={handleUpdateId}
         />
         {/* Table Section End */}
 
         {/* Create Form Start */}
         <AddMaterials
           openCreateForm={openCreateForm}
-          setOpenCreateForm={setOpenCreateForm}
           createForm={handleCreateFormVisibility}
           getAllMaterialsData={getAllMaterialsData}
+          materialDetails={materialDetails}
+          updateId={updateId}
+          updateIdState={updateIdState}
         />
         {/* Create Form End */}
       </section>

@@ -20,15 +20,16 @@ exports.create = async (req, res) => {
       lastOrderValue = lastMaterial.order;
     }
 
-    const materialExist = await MaterialsModel.findOne({
-      $or: [{ name }, { order: order || lastOrderValue + 1 }],
+    const alreadyExist = await MaterialsModel.findOne({
+      $or: [{ name }, { order }],
       deletedAt: null,
     });
 
-    if (materialExist) {
-      return res.status(409).json({
+    if (alreadyExist) {
+      return res.status(201).json({
         success: false,
-        message: "Material name || order already exists!!",
+        message: "Duplicate name || order no.!!",
+        data: [],
       });
     }
 
@@ -127,9 +128,26 @@ exports.getDetails = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name } = req.body;
 
-    const data = { name };
+    const { name, order } = req.body;
+
+    const ifAlreadyExist = await MaterialsModel.find({
+      _id: { $ne: id },
+      deletedAt: null,
+      $or: [{ name }, { order }],
+    });
+
+    if (ifAlreadyExist.length > 0) {
+      return res.status(201).json({
+        success: false,
+        message: "Duplicate name || order!!",
+        data: [],
+      });
+    }
+
+    const data = {};
+    if (name) data.name = name;
+    if (order) data.order = order;
 
     const updateData = await MaterialsModel.updateOne(
       { _id: id },
@@ -179,13 +197,51 @@ exports.delete = async (req, res) => {
     const { id } = req.body;
 
     const deleteData = await MaterialsModel.updateOne(
-      { _id: id },
+      {
+        _id: id,
+      },
       { $set: { deletedAt: Date.now() } }
     );
 
     return res.status(201).json({
       success: true,
       message: "Data deleted successfully!!",
+      data: deleteData,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong!!",
+      errorMessage: error.message,
+    });
+  }
+};
+
+// Delete Multiple Materials By Ids
+exports.deleteMultiple = async (req, res) => {
+  try {
+    const { ids } = req.body;
+
+    if (ids.length <= 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Select at least 1 record!!",
+        data: [],
+      });
+    }
+
+    const deleteData = await MaterialsModel.updateMany(
+      {
+        _id: {
+          $in: ids,
+        },
+      },
+      { $set: { deletedAt: Date.now() } }
+    );
+
+    return res.status(201).json({
+      success: true,
+      message: "Records deleted successfully!!",
       data: deleteData,
     });
   } catch (error) {

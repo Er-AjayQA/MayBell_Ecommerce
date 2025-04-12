@@ -1,33 +1,67 @@
 import { IoClose } from "react-icons/io5";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { createMaterialsService } from "../../../Services/MaterialServices";
+import {
+  createMaterialsService,
+  updateMaterialService,
+} from "../../../Services/MaterialServices";
+import { Link } from "react-router-dom";
+import { useEffect } from "react";
 
 export const AddMaterials = ({
   openCreateForm,
-  setOpenCreateForm,
   createForm,
   getAllMaterialsData,
+  updateId,
+  materialDetails,
+  updateIdState,
 }) => {
   const {
     register,
     handleSubmit,
+    setValue,
+    reset,
     formState: { errors },
   } = useForm();
 
   const onSubmit = async (data) => {
-    const response = await createMaterialsService(data);
-    console.log(response);
+    if (updateIdState) {
+      const response = await updateMaterialService(updateId, data);
 
-    if (response.success) {
-      toast.success(response.message);
-      setOpenCreateForm(false);
-      // data.reset();
-      getAllMaterialsData();
-    } else if (!response.success) {
-      toast.error(response.message);
+      if (response.success) {
+        toast.success(response.message);
+        reset();
+        createForm();
+        getAllMaterialsData();
+      } else {
+        toast.error(response.message);
+      }
+    } else {
+      const response = await createMaterialsService(data);
+
+      if (response.success) {
+        toast.success(response.message);
+        reset();
+        createForm();
+        getAllMaterialsData();
+      } else {
+        toast.error(response.message);
+      }
     }
   };
+
+  // Handle Create Form Visibility
+  const handleFormVisibility = () => {
+    reset();
+    createForm();
+  };
+
+  useEffect(() => {
+    if (updateIdState) {
+      setValue("name", materialDetails.name);
+      setValue("order", materialDetails.order);
+    }
+  });
 
   return (
     <>
@@ -39,8 +73,15 @@ export const AddMaterials = ({
       >
         <div className="absolute top-[20%] start-[50%] translate-x-[-50%] translate-y-[-20%] rounded-md bg-white z-[999] p-5 min-w-[500px]">
           <div className="mb-3 flex items-center justify-between">
-            <h1 className="py-3 font-bold">Create Material</h1>
-            <IoClose className="cursor-pointer" onClick={() => createForm()} />
+            <h1 className="py-3 font-bold">
+              {updateId !== null ? "Update Material" : "Create Material"}
+            </h1>
+            <Link to={"/furniture/admin-panel/materials"}>
+              <IoClose
+                className="cursor-pointer"
+                onClick={() => createForm()}
+              />
+            </Link>
           </div>
           <div>
             <form
@@ -84,18 +125,19 @@ export const AddMaterials = ({
                 />
               </div>
               <div className="flex justify-end gap-2">
-                <button
+                <Link
+                  to={"/furniture/admin-panel/materials"}
                   type="submit"
                   className="text-black bg-gray-400 hover:bg-gray-300 focus:ring-none focus:outline-none font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
-                  onClick={() => createForm()}
+                  onClick={handleFormVisibility}
                 >
                   Close
-                </button>
+                </Link>
                 <button
                   type="submit"
                   className="text-white bg-[#3e8ef7] hover:bg-[#589ffc] focus:ring-none focus:outline-none font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
                 >
-                  Create Material
+                  {updateId !== null ? "Update" : "Create"}
                 </button>
               </div>
             </form>
