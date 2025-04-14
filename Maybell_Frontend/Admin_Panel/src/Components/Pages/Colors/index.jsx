@@ -2,25 +2,28 @@ import { useEffect, useState } from "react";
 import { FaPlus, FaFilter } from "react-icons/fa";
 import { MdFilterAltOff } from "react-icons/md";
 import { BreadCrumb } from "../../UI/Breadcrumb";
-import { getMaterialsDetailById } from "../../../Services/MaterialServices";
 import { Link } from "react-router-dom";
 import { ColorFilterForm } from "../../UI/Colors/ColorFilterForm";
 import { ColorTableListing } from "../../UI/Colors/ColorListing";
 import { AddColors } from "../../UI/Colors/AddColors";
-import { getAllColorsService } from "../../../Services/ColorServices";
+import {
+  getAllColorsService,
+  getColorsDetailById,
+} from "../../../Services/ColorServices";
 
 export const Colors = () => {
   const [openCreateForm, setOpenCreateForm] = useState(false);
   const [filterFormStatus, setFilterFormStatus] = useState(false);
-  const [filterData, setFilterData] = useState({ name: "" });
+  const [filterData, setFilterData] = useState({ name: "", code: "" });
   const [allColors, setAllColors] = useState([]);
   const [updateId, setUpdateId] = useState(null);
-  const [materialDetails, setMaterialDetails] = useState([]);
+  const [colorDetails, setColorDetails] = useState([]);
   const [updateIdState, setUpdateIdState] = useState(false);
   const [totalRecords, setTotalRecords] = useState(null);
   const [currentLimit, setCurrentLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(null);
+  const [sort, setSort] = useState(false);
 
   // Handle On Page Change
   const onPageChange = (page) => {
@@ -33,7 +36,7 @@ export const Colors = () => {
     if (type === "create") {
       setUpdateId(null);
       setUpdateIdState(false);
-      setMaterialDetails([]);
+      setColorDetails([]);
     }
     setOpenCreateForm(!openCreateForm);
   };
@@ -51,7 +54,7 @@ export const Colors = () => {
 
   // Handle Clear Filter Form
   const handleClearFilterForm = () => {
-    setFilterData({ name: "" });
+    setFilterData({ name: "", code: "" });
   };
 
   // Get All Existing Materials
@@ -60,6 +63,7 @@ export const Colors = () => {
       ...filterData,
       limit: currentLimit,
       page: currentPage,
+      sort: sort,
     });
 
     if (response.success) {
@@ -87,23 +91,23 @@ export const Colors = () => {
   };
 
   // Get Material Detail
-  const getMaterialById = async () => {
-    const response = await getMaterialsDetailById(updateId);
+  const getColorById = async () => {
+    const response = await getColorsDetailById(updateId);
     if (response.success) {
-      setMaterialDetails(response.data);
+      setColorDetails(response.data);
     }
   };
 
   useEffect(() => {
-    getAllColorsData(currentLimit);
-  }, [filterData, currentLimit, currentPage]);
+    getAllColorsData();
+  }, [filterData, currentLimit, currentPage, sort]);
 
   useEffect(() => {
     if (updateId === null) {
       setUpdateIdState(false);
     } else {
       setUpdateIdState(true);
-      getMaterialById();
+      getColorById();
     }
   }, [updateId]);
 
@@ -169,6 +173,7 @@ export const Colors = () => {
           setCurrentPage={setCurrentPage}
           totalRecords={totalRecords}
           onPageChange={onPageChange}
+          setSort={setSort}
         />
         {/* Table Section End */}
 
@@ -177,7 +182,7 @@ export const Colors = () => {
           openCreateForm={openCreateForm}
           createForm={handleCreateFormVisibility}
           getAllColorsData={getAllColorsData}
-          materialDetails={materialDetails}
+          colorDetails={colorDetails}
           updateId={updateId}
           updateIdState={updateIdState}
           setUpdateId={setUpdateId}

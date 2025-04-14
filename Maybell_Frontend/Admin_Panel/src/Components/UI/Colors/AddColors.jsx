@@ -2,7 +2,9 @@ import { IoClose } from "react-icons/io5";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { ChromePicker } from "react-color";
+import "react-color-palette/css";
 import {
   createColorsService,
   updateColorService,
@@ -13,11 +15,12 @@ export const AddColors = ({
   createForm,
   getAllColorsData,
   updateId,
-  materialDetails,
+  colorDetails,
   updateIdState,
   setUpdateIdState,
   setUpdateId,
 }) => {
+  const [color, setColor] = useState("#000000");
   const {
     register,
     handleSubmit,
@@ -25,6 +28,10 @@ export const AddColors = ({
     reset,
     formState: { errors },
   } = useForm();
+
+  const handleColorChange = (newColor) => {
+    setColor(newColor.hex);
+  };
 
   const onSubmit = async (data) => {
     if (updateIdState) {
@@ -61,16 +68,23 @@ export const AddColors = ({
   };
 
   useEffect(() => {
-    if (updateIdState && materialDetails) {
-      setValue("name", materialDetails.name);
-      setValue("order", materialDetails.order);
+    if (updateIdState && colorDetails) {
+      setValue("name", colorDetails.name);
+      setValue("order", colorDetails.order);
+      setColor(colorDetails.colorCode);
     } else {
       reset({
         name: "",
+        code: "",
         order: "",
       });
+      setColor("#000000");
     }
-  }, [updateIdState, materialDetails, setValue, reset]);
+  }, [updateIdState, colorDetails, setValue, reset, setColor]);
+
+  useEffect(() => {
+    setValue("code", color);
+  }, [color, setValue]);
 
   return (
     <>
@@ -85,7 +99,7 @@ export const AddColors = ({
             <h1 className="py-3 font-bold">
               {updateIdState ? "Update Colors" : "Create Colors"}
             </h1>
-            <Link to={"/furniture/admin-panel/color"}>
+            <Link to={"/furniture/admin-panel/colors"}>
               <IoClose
                 className="cursor-pointer"
                 onClick={() => {
@@ -129,11 +143,14 @@ export const AddColors = ({
                 >
                   Color Code
                 </label>
-                <input
-                  type="color"
+                <ChromePicker
+                  color={color}
                   id="code"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg cursor-pointer focus:ring-blue-500 focus:border-blue-500 block w-[20%] h-[50px] p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="color code"
+                  onChange={handleColorChange}
+                />
+                <input
+                  type="hidden"
+                  id="code"
                   {...register("code", {
                     required: "Color Code is required",
                   })}

@@ -17,11 +17,11 @@ exports.create = async (req, res) => {
       const lastData = await ColorsModel.findOne({ deletedAt: null })
         .sort({ order: -1 })
         .limit(1);
-      lastOrderValue = lastData.order;
+      lastOrderValue = lastData.order + 1;
     }
 
     const alreadyExist = await ColorsModel.findOne({
-      $or: [{ name }, { color_code }, { order }],
+      $or: [{ name }, { colorCode: code }, { order: lastOrderValue }],
       deletedAt: null,
     });
 
@@ -36,7 +36,7 @@ exports.create = async (req, res) => {
     const data = {
       name,
       colorCode: code,
-      order: order ? order : lastOrderValue + 1,
+      order: order ? order : lastOrderValue,
     };
 
     const createColor = await ColorsModel.create(data);
@@ -63,7 +63,7 @@ exports.getAll = async (req, res) => {
     let page = parseInt(req?.body?.page) || 1;
     if (limit < 1) limit = 15;
     if (page < 1) page = 1;
-    const { name, colorCode } = req.body;
+    const { name, code, sort } = req.body;
 
     let skip = (page - 1) * limit;
 
@@ -74,8 +74,8 @@ exports.getAll = async (req, res) => {
       filter.name = nameRegex;
     }
 
-    if (colorCode != "" && colorCode != undefined) {
-      var nameRegex = new RegExp(colorCode, "i");
+    if (code != "" && code != undefined) {
+      var nameRegex = new RegExp(code, "i");
       filter.colorCode = nameRegex;
     }
 
@@ -86,7 +86,7 @@ exports.getAll = async (req, res) => {
       .limit(limit)
       .skip(skip)
       .sort({
-        _id: "desc",
+        _id: sort ? "asc" : "desc",
       });
 
     return res.status(200).json({
@@ -138,13 +138,31 @@ exports.getDetails = async (req, res) => {
   }
 };
 
-// Update Data By Id
+// Update Colors By Id
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, color_code } = req.body;
 
-    const data = { name, color_code };
+    const { name, code, order } = req.body;
+
+    const ifAlreadyExist = await ColorsModel.find({
+      _id: { $ne: id },
+      deletedAt: null,
+      $or: [{ name }, { colorCode: code }, { order }],
+    });
+
+    if (ifAlreadyExist.length > 0) {
+      return res.status(201).json({
+        success: false,
+        message: "Duplicate name, code || order!!",
+        data: [],
+      });
+    }
+
+    const data = {};
+    if (name) data.name = name;
+    if (code) data.colorCode = code;
+    if (order) data.order = order;
 
     const updateData = await ColorsModel.updateOne({ _id: id }, { $set: data });
 
@@ -165,9 +183,9 @@ exports.update = async (req, res) => {
 // Change Status
 exports.updateStatus = async (req, res) => {
   try {
-    const { ids } = req.body;
+    const { id } = req.body;
 
-    const updateData = await ColorsModel.updateMany({ _id: { $in: ids } }, [
+    const updateData = await ColorsModel.updateOne({ _id: id }, [
       { $set: { status: { $not: "$status" } } },
     ]);
 
@@ -185,19 +203,21 @@ exports.updateStatus = async (req, res) => {
   }
 };
 
-// Delete Data By Ids
+// Delete Single Data By Id
 exports.delete = async (req, res) => {
   try {
-    const { ids } = req.body;
+    const { id } = req.body;
 
-    const deleteData = await ColorsModel.updateMany(
-      { _id: { $in: ids } },
+    const deleteData = await ColorsModel.updateOne(
+      {
+        _id: id,
+      },
       { $set: { deletedAt: Date.now() } }
     );
 
     return res.status(201).json({
       success: true,
-      message: "Colors deleted successfully!!",
+      message: "Data deleted successfully!!",
       data: deleteData,
     });
   } catch (error) {
@@ -208,7 +228,6 @@ exports.delete = async (req, res) => {
     });
   }
 };
-
 // Delete Multiple Colors By Ids
 exports.deleteMultiple = async (req, res) => {
   try {

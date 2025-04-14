@@ -2,17 +2,17 @@ import { Table, Checkbox, Tooltip, Pagination } from "flowbite-react";
 import { useState } from "react";
 import { AiOutlineSwap } from "react-icons/ai";
 import { FaFilePdf } from "react-icons/fa";
-import { MdDeleteForever, MdEdit } from "react-icons/md";
+import { MdOutlineSwapVert, MdDeleteForever, MdEdit } from "react-icons/md";
 import { GrDocumentCsv } from "react-icons/gr";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { TbArrowsSort } from "react-icons/tb";
 import { toast } from "react-toastify";
-import {
-  changeMaterialsStatusService,
-  deleteMaterialService,
-  deleteMultipleMaterialService,
-} from "../../../Services/MaterialServices";
 import { Link } from "react-router-dom";
+import {
+  changeColorsStatusService,
+  deleteColorService,
+  deleteMultipleColorsService,
+} from "../../../Services/ColorServices";
 
 export const ColorTableListing = ({
   allColors,
@@ -25,6 +25,7 @@ export const ColorTableListing = ({
   onPageChange,
   currentPage,
   totalRecords,
+  setSort,
 }) => {
   const [selectedRecords, setSelectedRecords] = useState([]);
 
@@ -43,8 +44,8 @@ export const ColorTableListing = ({
   // Handle Select All Checkboxes
   const handleSelectAllCheckboxes = (event) => {
     if (event.target.checked) {
-      const data = allMaterials.map((material) => {
-        return material._id;
+      const data = allColors.map((color) => {
+        return color._id;
       });
       setSelectedRecords(data);
     } else {
@@ -54,33 +55,33 @@ export const ColorTableListing = ({
 
   // Change Status of Materials
   const handleStatusChange = async (id) => {
-    const response = await changeMaterialsStatusService({ id });
+    const response = await changeColorsStatusService({ id });
 
     if (response.success) {
       toast.success(response.message);
-      getAllMaterialsData();
+      getAllColorsData();
     }
   };
 
   // Handle Delete Materials
-  const handleDeleteMaterials = async (id) => {
-    const response = await deleteMaterialService({ id });
+  const handleDeleteColors = async (id) => {
+    const response = await deleteColorService({ id });
 
     if (response.success) {
       toast.success(response.message);
-      getAllMaterialsData();
+      getAllColorsData();
     }
   };
 
   // Handle Delete Multiple Data
-  const handleDeleteMultipleMaterials = async () => {
-    const response = await deleteMultipleMaterialService({
+  const handleDeleteMultipleColors = async () => {
+    const response = await deleteMultipleColorsService({
       ids: selectedRecords,
     });
 
     if (response.success) {
       toast.success(response.message);
-      getAllMaterialsData();
+      getAllColorsData();
     } else {
       toast.error(response.message);
     }
@@ -126,6 +127,7 @@ export const ColorTableListing = ({
                   name="name"
                   id="default-search"
                   value={filterData.name}
+                  placeholder="search by name"
                   className="block py-1 px-3 text-sm text-gray-600 border rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
                   onChange={(event) => filterFormData(event)}
                 />
@@ -138,21 +140,21 @@ export const ColorTableListing = ({
           <div className="rightForm">
             <div className="flex gap-1">
               <Tooltip content="Reorder" placement="top">
-                <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200">
-                  <AiOutlineSwap />
+                <button
+                  className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200"
+                  onClick={() => {
+                    setSort((prev) => !prev);
+                  }}
+                >
+                  <MdOutlineSwapVert />
                 </button>
               </Tooltip>
               <Tooltip content="Delete Selected" placement="top">
                 <button
                   className="p-2 text-red-500 hover:bg-gray-100 rounded-lg border border-gray-200"
-                  onClick={handleDeleteMultipleMaterials}
+                  onClick={handleDeleteMultipleColors}
                 >
                   <RiDeleteBin5Fill />
-                </button>
-              </Tooltip>
-              <Tooltip content="Save Order" placement="top">
-                <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200">
-                  <TbArrowsSort />
                 </button>
               </Tooltip>
               <Tooltip content="Download CSV" placement="top">
@@ -189,6 +191,7 @@ export const ColorTableListing = ({
               </Table.HeadCell>
               <Table.HeadCell>Name</Table.HeadCell>
               <Table.HeadCell>Code</Table.HeadCell>
+              <Table.HeadCell>Color Palette</Table.HeadCell>
               <Table.HeadCell>Order</Table.HeadCell>
               <Table.HeadCell>Status</Table.HeadCell>
               <Table.HeadCell>Action</Table.HeadCell>
@@ -217,7 +220,13 @@ export const ColorTableListing = ({
                         {color?.name}
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                        {color?.color_code}
+                        {color?.colorCode}
+                      </Table.Cell>
+                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                        <div
+                          className={`w-[30px] h-[30px] rounded-full mx-auto shadow-md`}
+                          style={{ backgroundColor: color?.colorCode }}
+                        />
                       </Table.Cell>
                       <Table.Cell>{color?.order}</Table.Cell>
                       <Table.Cell>
@@ -237,7 +246,7 @@ export const ColorTableListing = ({
                       <Table.Cell>
                         <div className="flex justify-center items-center gap-2">
                           <Link
-                            to={`/furniture/admin-panel/materials/update/${color?._id}`}
+                            to={`/furniture/admin-panel/colors/update/${color?._id}`}
                             className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-green-400 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out"
                             onClick={() => handleUpdateId(color?._id, "update")}
                           >
@@ -245,7 +254,7 @@ export const ColorTableListing = ({
                           </Link>
                           <button
                             className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-red-600 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out"
-                            onClick={() => handleDeleteMaterials(color?._id)}
+                            onClick={() => handleDeleteColors(color?._id)}
                           >
                             <MdDeleteForever />
                           </button>

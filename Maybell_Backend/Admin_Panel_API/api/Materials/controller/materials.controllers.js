@@ -196,7 +196,7 @@ exports.updateStatus = async (req, res) => {
   }
 };
 
-// Delete Materials By Ids
+// Delete Single Data By Id
 exports.delete = async (req, res) => {
   try {
     const { id } = req.body;

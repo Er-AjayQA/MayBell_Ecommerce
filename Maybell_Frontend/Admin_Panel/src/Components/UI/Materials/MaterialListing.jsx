@@ -125,6 +125,7 @@ export const MaterialTableListing = ({
                   type="search"
                   name="name"
                   id="default-search"
+                  placeholder="search by name"
                   value={filterData.name}
                   className="block py-1 px-3 text-sm text-gray-600 border rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
                   onChange={(event) => filterFormData(event)}
