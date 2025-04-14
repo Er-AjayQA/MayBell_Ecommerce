@@ -2,20 +2,18 @@ import { useEffect, useState } from "react";
 import { FaPlus, FaFilter } from "react-icons/fa";
 import { MdFilterAltOff } from "react-icons/md";
 import { BreadCrumb } from "../../UI/Breadcrumb";
-import { AddMaterials } from "../../UI/Materials/AddMaterials";
-import { MaterialFilterForm } from "../../UI/Materials/MaterialFilterForm";
-import { MaterialTableListing } from "../../UI/Materials/MaterialListing";
-import {
-  getAllMaterialsService,
-  getMaterialsDetailById,
-} from "../../../Services/MaterialServices";
+import { getMaterialsDetailById } from "../../../Services/MaterialServices";
 import { Link } from "react-router-dom";
+import { ColorFilterForm } from "../../UI/Colors/ColorFilterForm";
+import { ColorTableListing } from "../../UI/Colors/ColorListing";
+import { AddColors } from "../../UI/Colors/AddColors";
+import { getAllColorsService } from "../../../Services/ColorServices";
 
-export const Materials = () => {
+export const Colors = () => {
   const [openCreateForm, setOpenCreateForm] = useState(false);
   const [filterFormStatus, setFilterFormStatus] = useState(false);
   const [filterData, setFilterData] = useState({ name: "" });
-  const [allMaterials, setAllMaterials] = useState([]);
+  const [allColors, setAllColors] = useState([]);
   const [updateId, setUpdateId] = useState(null);
   const [materialDetails, setMaterialDetails] = useState([]);
   const [updateIdState, setUpdateIdState] = useState(false);
@@ -57,8 +55,8 @@ export const Materials = () => {
   };
 
   // Get All Existing Materials
-  const getAllMaterialsData = async () => {
-    const response = await getAllMaterialsService({
+  const getAllColorsData = async () => {
+    const response = await getAllColorsService({
       ...filterData,
       limit: currentLimit,
       page: currentPage,
@@ -67,7 +65,7 @@ export const Materials = () => {
     if (response.success) {
       setTotalPages(response.totalPages);
       setTotalRecords(response.totalRecords);
-      setAllMaterials(response.data);
+      setAllColors(response.data);
     }
   };
 
@@ -97,7 +95,7 @@ export const Materials = () => {
   };
 
   useEffect(() => {
-    getAllMaterialsData(currentLimit);
+    getAllColorsData(currentLimit);
   }, [filterData, currentLimit, currentPage]);
 
   useEffect(() => {
@@ -115,7 +113,7 @@ export const Materials = () => {
         {/* Body Header Start */}
         <div className="flex items-center mb-3">
           {/* Breadcrumb Start */}
-          <BreadCrumb title={"Materials Listing"} subtitle={"Materials"} />
+          <BreadCrumb title={"Colors Listing"} subtitle={"Colors"} />
           {/* Breadcrumb End */}
 
           {/* Action Buttons Start */}
@@ -135,7 +133,7 @@ export const Materials = () => {
                 )}
               </button>
               <Link
-                to={"/furniture/admin-panel/materials/create"}
+                to={"/furniture/admin-panel/colors/create"}
                 className="w-[2.5rem] h-[2.5rem] p-1 rounded-[50%] bg-[#3e8ef7] flex items-center justify-center shadow-lg transition-all duration-1000 ease-in-out hover:shadow-sm hover:bg-[#589FFC]"
                 onClick={() => {
                   handleCreateFormVisibility("create");
@@ -150,7 +148,7 @@ export const Materials = () => {
         {/* Body Header End */}
 
         {/* Filter Section Start */}
-        <MaterialFilterForm
+        <ColorFilterForm
           filterFormStatus={filterFormStatus}
           filterData={filterData}
           filterFormData={handleFilterData}
@@ -159,10 +157,10 @@ export const Materials = () => {
         {/* Filter Section End */}
 
         {/* Table Section Start */}
-        <MaterialTableListing
-          allMaterials={allMaterials}
+        <ColorTableListing
+          allColors={allColors}
           filterData={filterData}
-          getAllMaterialsData={getAllMaterialsData}
+          getAllColorsData={getAllColorsData}
           filterFormData={handleFilterData}
           handleUpdateId={handleUpdateId}
           handleSelection={handleSelection}
@@ -175,10 +173,10 @@ export const Materials = () => {
         {/* Table Section End */}
 
         {/* Create Form Start */}
-        <AddMaterials
+        <AddColors
           openCreateForm={openCreateForm}
           createForm={handleCreateFormVisibility}
-          getAllMaterialsData={getAllMaterialsData}
+          getAllColorsData={getAllColorsData}
           materialDetails={materialDetails}
           updateId={updateId}
           updateIdState={updateIdState}

@@ -10,6 +10,7 @@ router.post("/get-details/:id", ColorsController.getDetails);
 router.put("/update/:id", ColorsController.update);
 router.put("/update-status", ColorsController.updateStatus);
 router.post("/delete", ColorsController.delete);
+router.put("/delete-multiple", ColorsController.deleteMultiple);
 
 // Export Router
 module.exports = router;

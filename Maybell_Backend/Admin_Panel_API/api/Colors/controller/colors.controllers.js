@@ -4,24 +4,48 @@ const ColorsModel = require("../model/colors.model");
 // Create New Data
 exports.create = async (req, res) => {
   try {
-    const { name, color_code } = req.body;
-
-    const getAllData = await ColorsModel.find();
+    const { name, code, order } = req.body;
 
     let lastOrderValue = 0;
-    if (getAllData.length >= 1) {
-      lastOrderValue = getAllData[getAllData.length - 1].order;
+
+    // Get count to handle empty collection case
+    const dataCount = await ColorsModel.countDocuments({
+      deletedAt: null,
+    });
+
+    if (!order && dataCount > 0) {
+      const lastData = await ColorsModel.findOne({ deletedAt: null })
+        .sort({ order: -1 })
+        .limit(1);
+      lastOrderValue = lastData.order;
     }
 
-    const data = { name, color_code, order: lastOrderValue + 1 };
+    const alreadyExist = await ColorsModel.findOne({
+      $or: [{ name }, { color_code }, { order }],
+      deletedAt: null,
+    });
 
-    const createData = await ColorsModel.create(data);
-    await createData.save();
+    if (alreadyExist) {
+      return res.status(201).json({
+        success: false,
+        message: "Duplicate name, Code or order no.!!",
+        data: [],
+      });
+    }
+
+    const data = {
+      name,
+      colorCode: code,
+      order: order ? order : lastOrderValue + 1,
+    };
+
+    const createColor = await ColorsModel.create(data);
+    await createColor.save();
 
     return res.status(201).json({
       success: true,
       message: "Color created successfully!!",
-      data: createData,
+      data: createColor,
     });
   } catch (error) {
     return res.status(500).json({
@@ -32,14 +56,14 @@ exports.create = async (req, res) => {
   }
 };
 
-// View All Data
+// Get All Colors
 exports.getAll = async (req, res) => {
   try {
-    const { name, color_code } = req.body;
     let limit = parseInt(req?.body?.limit) || 15;
     let page = parseInt(req?.body?.page) || 1;
     if (limit < 1) limit = 15;
     if (page < 1) page = 1;
+    const { name, colorCode } = req.body;
 
     let skip = (page - 1) * limit;
 
@@ -49,10 +73,14 @@ exports.getAll = async (req, res) => {
       var nameRegex = new RegExp(name, "i");
       filter.name = nameRegex;
     }
-    if (color_code != "" && color_code != undefined) {
-      var colorRegex = new RegExp(color_code, "i");
-      filter.color_code = colorRegex;
+
+    if (colorCode != "" && colorCode != undefined) {
+      var nameRegex = new RegExp(colorCode, "i");
+      filter.colorCode = nameRegex;
     }
+
+    // Calculate total number of records
+    const totalRecords = await ColorsModel.countDocuments(filter);
 
     const getAllData = await ColorsModel.find(filter)
       .limit(limit)
@@ -63,7 +91,9 @@ exports.getAll = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      totalRecords: getAllData.length >= 1 ? getAllData.length : 0,
+      totalRecords: totalRecords,
+      totalPages: Math.max(1, Math.ceil(totalRecords / limit)),
+      currentPage: page,
       message:
         getAllData.length >= 1
           ? "Fetched data successfully!!"
@@ -168,6 +198,42 @@ exports.delete = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "Colors deleted successfully!!",
+      data: deleteData,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong!!",
+      errorMessage: error.message,
+    });
+  }
+};
+
+// Delete Multiple Colors By Ids
+exports.deleteMultiple = async (req, res) => {
+  try {
+    const { ids } = req.body;
+
+    if (ids.length <= 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Select at least 1 record!!",
+        data: [],
+      });
+    }
+
+    const deleteData = await ColorsModel.updateMany(
+      {
+        _id: {
+          $in: ids,
+        },
+      },
+      { $set: { deletedAt: Date.now() } }
+    );
+
+    return res.status(201).json({
+      success: true,
+      message: "Records deleted successfully!!",
       data: deleteData,
     });
   } catch (error) {

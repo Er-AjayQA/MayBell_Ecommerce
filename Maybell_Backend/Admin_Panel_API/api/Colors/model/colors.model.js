@@ -6,12 +6,10 @@ const ColorsSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    unique: true,
   },
-  color_code: {
+  colorCode: {
     type: String,
     required: true,
-    unique: true,
   },
   order: { type: Number, min: 0, max: 10000, default: 0 },
   status: {
