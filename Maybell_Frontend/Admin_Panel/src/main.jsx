@@ -13,7 +13,6 @@ import { Sliders } from "./Components/Pages/Sliders";
 import { Testimonials } from "./Components/Pages/Testimonials";
 import { WhyChooseUs } from "./Components/Pages/WhyChooseUs";
 import { Coupons } from "./Components/Pages/Coupons";
-import { Categories } from "./Components/Pages/Categories";
 import { Materials } from "./Components/Pages/Materials";
 import { Products } from "./Components/Pages/Products";
 import { Enquiry } from "./Components/Pages/Enquiry";
@@ -24,6 +23,7 @@ import { Faq } from "./Components/Pages/Faq";
 import { CmsPages } from "./Components/Pages/CmsPages";
 import { BodyLayout } from "./Components/Layouts/BodyLayout";
 import { Colors } from "./Components/Pages/Colors";
+import { Category } from "./Components/Pages/Category";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -55,10 +55,11 @@ createRoot(document.getElementById("root")).render(
               path="/furniture/admin-panel/coupons"
               element={<Coupons />}
             />
-            <Route
-              path="/furniture/admin-panel/categories"
-              element={<Categories />}
-            />
+            <Route path="/furniture/admin-panel/">
+              <Route path="categories" element={<Category />} />
+              <Route path="categories/create" element={<Category />} />
+              <Route path="categories/update/:id" element={<Category />} />
+            </Route>
             <Route path="/furniture/admin-panel/">
               <Route path="colors" element={<Colors />} />
               <Route path="colors/create" element={<Colors />} />

@@ -13,10 +13,15 @@ import {
   deleteColorService,
   deleteMultipleColorsService,
 } from "../../../Services/ColorServices";
+import {
+  changeCategoryStatusService,
+  deleteCategoryService,
+  deleteMultipleCategoryService,
+} from "../../../Services/CategoryServices";
 
-export const ColorTableListing = ({
-  allColors,
-  getAllColorsData,
+export const CategoryTableListing = ({
+  allCategories,
+  getAllCategoryData,
   filterData,
   filterFormData,
   handleUpdateId,
@@ -44,7 +49,7 @@ export const ColorTableListing = ({
   // Handle Select All Checkboxes
   const handleSelectAllCheckboxes = (event) => {
     if (event.target.checked) {
-      const data = allCategories.map((color) => {
+      const data = allColors.map((color) => {
         return color._id;
       });
       setSelectedRecords(data);
@@ -55,33 +60,33 @@ export const ColorTableListing = ({
 
   // Change Status of Materials
   const handleStatusChange = async (id) => {
-    const response = await changeColorsStatusService({ id });
+    const response = await changeCategoryStatusService({ id });
 
     if (response.success) {
       toast.success(response.message);
-      getAllColorsData();
+      getAllCategoryData();
     }
   };
 
   // Handle Delete Materials
-  const handleDeleteColors = async (id) => {
-    const response = await deleteColorService({ id });
+  const handleDeleteCategory = async (id) => {
+    const response = await deleteCategoryService({ id });
 
     if (response.success) {
       toast.success(response.message);
-      getAllColorsData();
+      getAllCategoryData();
     }
   };
 
   // Handle Delete Multiple Data
-  const handleDeleteMultipleColors = async () => {
-    const response = await deleteMultipleColorsService({
+  const handleDeleteMultipleCategories = async () => {
+    const response = await deleteMultipleCategoryService({
       ids: selectedRecords,
     });
 
     if (response.success) {
       toast.success(response.message);
-      getAllColorsData();
+      getAllCategoryData();
     } else {
       toast.error(response.message);
     }
@@ -152,7 +157,7 @@ export const ColorTableListing = ({
               <Tooltip content="Delete Selected" placement="top">
                 <button
                   className="p-2 text-red-500 hover:bg-gray-100 rounded-lg border border-gray-200"
-                  onClick={handleDeleteMultipleColors}
+                  onClick={handleDeleteMultipleCategories}
                 >
                   <RiDeleteBin5Fill />
                 </button>
@@ -182,61 +187,50 @@ export const ColorTableListing = ({
                   defaultChecked="false"
                   onChange={handleSelectAllCheckboxes}
                   checked={
-                    allColors.length >= 1 &&
-                    selectedRecords.length === allColors.length
+                    allCategories.length >= 1 &&
+                    selectedRecords.length === allCategories.length
                       ? "checked"
                       : ""
                   }
                 />
               </Table.HeadCell>
               <Table.HeadCell>Name</Table.HeadCell>
-              <Table.HeadCell>Code</Table.HeadCell>
-              <Table.HeadCell>Color Palette</Table.HeadCell>
               <Table.HeadCell>Order</Table.HeadCell>
               <Table.HeadCell>Status</Table.HeadCell>
               <Table.HeadCell>Action</Table.HeadCell>
             </Table.Head>
 
             <Table.Body className="divide-y ">
-              {allColors?.length >= 1 ? (
-                allColors.map((color) => {
+              {allCategories?.length >= 1 ? (
+                allCategories.map((category) => {
                   return (
                     <Table.Row
                       className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center"
-                      key={color?._id}
+                      key={category?._id}
                     >
                       <Table.Cell className="p-4">
                         <Checkbox
                           defaultChecked="false"
-                          onClick={() => handleCheckboxSelection(color?._id)}
+                          onClick={() => handleCheckboxSelection(category?._id)}
                           checked={
-                            selectedRecords.includes(color?._id)
+                            selectedRecords.includes(category?._id)
                               ? "checked"
                               : ""
                           }
                         />
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                        {color?.name}
+                        {category?.name}
                       </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                        {color?.colorCode}
-                      </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                        <div
-                          className={`w-[30px] h-[30px] rounded-full mx-auto shadow-md`}
-                          style={{ backgroundColor: color?.colorCode }}
-                        />
-                      </Table.Cell>
-                      <Table.Cell>{color?.order}</Table.Cell>
+                      <Table.Cell>{category?.order}</Table.Cell>
                       <Table.Cell>
                         <div
                           className={`w-[50px] h-[20px] border border-gray-300 m-auto shadow-md rounded-full cursor-pointer flex items-center transition-colors duration-300 ${
-                            color?.status
+                            category?.status
                               ? "bg-green-400 justify-end"
                               : "bg-red-400 justify-start"
                           }`}
-                          onClick={() => handleStatusChange(color?._id)}
+                          onClick={() => handleStatusChange(category?._id)}
                         >
                           <span
                             className={`w-[24px] h-[18px] bg-white border-solid border-[1px] border-black rounded-full shadow-inner transform transition-transform duration-300`}
@@ -246,15 +240,17 @@ export const ColorTableListing = ({
                       <Table.Cell>
                         <div className="flex justify-center items-center gap-2">
                           <Link
-                            to={`/furniture/admin-panel/colors/update/${color?._id}`}
+                            to={`/furniture/admin-panel/categories/update/${category?._id}`}
                             className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-green-400 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out"
-                            onClick={() => handleUpdateId(color?._id, "update")}
+                            onClick={() =>
+                              handleUpdateId(category?._id, "update")
+                            }
                           >
                             <MdEdit />
                           </Link>
                           <button
                             className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-red-600 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out"
-                            onClick={() => handleDeleteColors(color?._id)}
+                            onClick={() => handleDeleteCategory(category?._id)}
                           >
                             <MdDeleteForever />
                           </button>
@@ -282,7 +278,7 @@ export const ColorTableListing = ({
               </span>
               to
               <span className="font-semibold text-gray-900 dark:text-white">
-                {allColors.length}
+                {allCategories.length}
               </span>
               of
               <span className="font-semibold text-gray-900 dark:text-white">

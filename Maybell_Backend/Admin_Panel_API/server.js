@@ -15,6 +15,7 @@ const slidersRoutes = require("./api/Sliders/router/sliders.router");
 const testimonialsRoutes = require("./api/Testimonials/router/testimonials.router");
 const whyChooseUsRoutes = require("./api/WhyChooseUs/router/whyChooseUs.router");
 const couponsRoutes = require("./api/Coupons/router/coupons.router");
+const categoryRoutes = require("./api/Categories/router/category.router");
 
 // Using Middlewares
 app.use(
@@ -32,6 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/v1/admin/default", defaultRoutes);
 app.use("/api/v1/admin/materials", materialsRoutes);
 app.use("/api/v1/admin/colors", colorsRoutes);
+app.use("/api/v1/admin/categories", categoryRoutes);
 app.use("/api/v1/admin/admin-user", adminsRoutes);
 app.use("/api/v1/admin/sliders", slidersRoutes);
 app.use("/api/v1/admin/testimonials", testimonialsRoutes);
