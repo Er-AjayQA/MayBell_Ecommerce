@@ -6,7 +6,7 @@ exports.create = async (req, res) => {
   try {
     const { name, code, order } = req.body;
 
-    let lastOrderValue = 0;
+    let lastOrderValue = 1;
 
     // Get count to handle empty collection case
     const dataCount = await ColorsModel.countDocuments({
@@ -17,11 +17,15 @@ exports.create = async (req, res) => {
       const lastData = await ColorsModel.findOne({ deletedAt: null })
         .sort({ order: -1 })
         .limit(1);
-      lastOrderValue = lastData.order + 1;
+      lastOrderValue = lastData ? lastData.order + 1 : lastOrderValue + 1;
     }
 
     const alreadyExist = await ColorsModel.findOne({
-      $or: [{ name }, { colorCode: code }, { order: lastOrderValue }],
+      $or: [
+        { name },
+        { colorCode: code },
+        { order: order ? order : lastOrderValue },
+      ],
       deletedAt: null,
     });
 
