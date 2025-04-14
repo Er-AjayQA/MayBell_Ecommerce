@@ -70,6 +70,9 @@ exports.getAll = async (req, res) => {
       filter.name = nameRegex;
     }
 
+    // Calculate total number of records
+    const totalRecords = await MaterialsModel.countDocuments(filter);
+
     const getAllData = await MaterialsModel.find(filter)
       .limit(limit)
       .skip(skip)
@@ -79,7 +82,9 @@ exports.getAll = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      totalRecords: getAllData.length >= 1 ? getAllData.length : 0,
+      totalRecords: totalRecords,
+      totalPages: Math.max(1, Math.ceil(totalRecords / limit)),
+      currentPage: page,
       message:
         getAllData.length >= 1
           ? "Fetched data successfully!!"

@@ -15,6 +15,8 @@ export const AddMaterials = ({
   updateId,
   materialDetails,
   updateIdState,
+  setUpdateIdState,
+  setUpdateId,
 }) => {
   const {
     register,
@@ -33,6 +35,8 @@ export const AddMaterials = ({
         reset();
         createForm();
         getAllMaterialsData();
+        setUpdateIdState(false);
+        setUpdateId(null);
       } else {
         toast.error(response.message);
       }
@@ -57,11 +61,16 @@ export const AddMaterials = ({
   };
 
   useEffect(() => {
-    if (updateIdState) {
+    if (updateIdState && materialDetails) {
       setValue("name", materialDetails.name);
       setValue("order", materialDetails.order);
+    } else {
+      reset({
+        name: "",
+        order: "",
+      });
     }
-  });
+  }, [updateIdState, materialDetails, setValue, reset]);
 
   return (
     <>
@@ -74,12 +83,16 @@ export const AddMaterials = ({
         <div className="absolute top-[20%] start-[50%] translate-x-[-50%] translate-y-[-20%] rounded-md bg-white z-[999] p-5 min-w-[500px]">
           <div className="mb-3 flex items-center justify-between">
             <h1 className="py-3 font-bold">
-              {updateId !== null ? "Update Material" : "Create Material"}
+              {updateIdState ? "Update Material" : "Create Material"}
             </h1>
             <Link to={"/furniture/admin-panel/materials"}>
               <IoClose
                 className="cursor-pointer"
-                onClick={() => createForm()}
+                onClick={() => {
+                  setUpdateId(null);
+                  setUpdateIdState(false);
+                  createForm();
+                }}
               />
             </Link>
           </div>
@@ -129,7 +142,11 @@ export const AddMaterials = ({
                   to={"/furniture/admin-panel/materials"}
                   type="submit"
                   className="text-black bg-gray-400 hover:bg-gray-300 focus:ring-none focus:outline-none font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
-                  onClick={handleFormVisibility}
+                  onClick={() => {
+                    handleFormVisibility();
+                    setUpdateId(null);
+                    setUpdateIdState(false);
+                  }}
                 >
                   Close
                 </Link>
@@ -137,7 +154,7 @@ export const AddMaterials = ({
                   type="submit"
                   className="text-white bg-[#3e8ef7] hover:bg-[#589ffc] focus:ring-none focus:outline-none font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
                 >
-                  {updateId !== null ? "Update" : "Create"}
+                  {updateIdState ? "Update" : "Create"}
                 </button>
               </div>
             </form>

@@ -1,4 +1,4 @@
-import { Table, Checkbox, Tooltip } from "flowbite-react";
+import { Table, Checkbox, Tooltip, Pagination } from "flowbite-react";
 import { useState } from "react";
 import { AiOutlineSwap } from "react-icons/ai";
 import { FaFilePdf } from "react-icons/fa";
@@ -20,6 +20,11 @@ export const MaterialTableListing = ({
   filterData,
   filterFormData,
   handleUpdateId,
+  handleSelection,
+  totalPages,
+  onPageChange,
+  currentPage,
+  totalRecords,
 }) => {
   const [selectedRecords, setSelectedRecords] = useState([]);
 
@@ -100,10 +105,11 @@ export const MaterialTableListing = ({
                 <select
                   id="countries"
                   className="bg-gray-50 border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block py-1 px-2"
+                  onChange={(event) => handleSelection(event)}
                 >
-                  <option value="20">20</option>
-                  <option value="35">35</option>
+                  <option value="10">10</option>
                   <option value="50">50</option>
+                  <option value="100">100</option>
                   <option value="all">All</option>
                 </select>
                 <span className="text-gray-600 text-sm">entries</span>
@@ -229,7 +235,9 @@ export const MaterialTableListing = ({
                           <Link
                             to={`/furniture/admin-panel/materials/update/${material?._id}`}
                             className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-green-400 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out"
-                            onClick={() => handleUpdateId(material?._id)}
+                            onClick={() =>
+                              handleUpdateId(material?._id, "update")
+                            }
                           >
                             <MdEdit />
                           </Link>
@@ -254,6 +262,34 @@ export const MaterialTableListing = ({
             </Table.Body>
           </Table>
         </div>
+        {
+          <div className="flex justify-between items-center mt-3">
+            <div className="flex justify-center items-center gap-2 text-sm text-gray-700 dark:text-gray-400">
+              Showing
+              <span className="font-semibold text-gray-900 dark:text-white">
+                1
+              </span>
+              to
+              <span className="font-semibold text-gray-900 dark:text-white">
+                {allMaterials.length}
+              </span>
+              of
+              <span className="font-semibold text-gray-900 dark:text-white">
+                {totalRecords}
+              </span>
+              Entries
+            </div>
+            {totalPages > 1 && (
+              <div className="flex overflow-x-auto sm:justify-center">
+                <Pagination
+                  currentPage={Math.min(Math.max(1, currentPage), totalPages)}
+                  totalPages={totalPages}
+                  onPageChange={(page) => onPageChange(page)}
+                />
+              </div>
+            )}
+          </div>
+        }
 
         {/* Pagination would go here */}
 

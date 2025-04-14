@@ -19,9 +19,24 @@ export const Materials = () => {
   const [updateId, setUpdateId] = useState(null);
   const [materialDetails, setMaterialDetails] = useState([]);
   const [updateIdState, setUpdateIdState] = useState(false);
+  const [totalRecords, setTotalRecords] = useState(null);
+  const [currentLimit, setCurrentLimit] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(null);
+
+  // Handle On Page Change
+  const onPageChange = (page) => {
+    setCurrentPage(page);
+    getAllMaterialsData();
+  };
 
   // Handle Create Form Visibility
-  const handleCreateFormVisibility = () => {
+  const handleCreateFormVisibility = (type) => {
+    if (type === "create") {
+      setUpdateId(null);
+      setUpdateIdState(false);
+      setMaterialDetails([]);
+    }
     setOpenCreateForm(!openCreateForm);
   };
 
@@ -43,13 +58,22 @@ export const Materials = () => {
 
   // Get All Existing Materials
   const getAllMaterialsData = async () => {
-    const response = await getAllMaterialsService(filterData);
-    setAllMaterials(response.data);
+    const response = await getAllMaterialsService({
+      ...filterData,
+      limit: currentLimit,
+      page: currentPage,
+    });
+
+    if (response.success) {
+      setTotalPages(response.totalPages);
+      setTotalRecords(response.totalRecords);
+      setAllMaterials(response.data);
+    }
   };
 
   // Handle Set Update Id
-  const handleUpdateId = (id) => {
-    handleCreateFormVisibility();
+  const handleUpdateId = (id, type) => {
+    handleCreateFormVisibility(type);
     setUpdateId((prev) => {
       if (!id) {
         return (prev = null);
@@ -57,6 +81,11 @@ export const Materials = () => {
         return (prev = id);
       }
     });
+  };
+
+  // Handle Current Limit
+  const handleSelection = (event) => {
+    setCurrentLimit(event.target.value);
   };
 
   // Get Material Detail
@@ -68,8 +97,8 @@ export const Materials = () => {
   };
 
   useEffect(() => {
-    getAllMaterialsData();
-  }, [filterData]);
+    getAllMaterialsData(currentLimit);
+  }, [filterData, currentLimit, currentPage]);
 
   useEffect(() => {
     if (updateId === null) {
@@ -79,6 +108,8 @@ export const Materials = () => {
       getMaterialById();
     }
   }, [updateId]);
+
+  console.log(totalPages);
 
   return (
     <>
@@ -108,7 +139,9 @@ export const Materials = () => {
               <Link
                 to={"/furniture/admin-panel/materials/create"}
                 className="w-[2.5rem] h-[2.5rem] p-1 rounded-[50%] bg-[#3e8ef7] flex items-center justify-center shadow-lg transition-all duration-1000 ease-in-out hover:shadow-sm hover:bg-[#589FFC]"
-                onClick={handleCreateFormVisibility}
+                onClick={() => {
+                  handleCreateFormVisibility("create");
+                }}
               >
                 <FaPlus className="text-white text-[1rem]" />
               </Link>
@@ -134,6 +167,12 @@ export const Materials = () => {
           getAllMaterialsData={getAllMaterialsData}
           filterFormData={handleFilterData}
           handleUpdateId={handleUpdateId}
+          handleSelection={handleSelection}
+          totalPages={totalPages}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          totalRecords={totalRecords}
+          onPageChange={onPageChange}
         />
         {/* Table Section End */}
 
@@ -145,6 +184,9 @@ export const Materials = () => {
           materialDetails={materialDetails}
           updateId={updateId}
           updateIdState={updateIdState}
+          setUpdateId={setUpdateId}
+          setUpdateIdState={setUpdateIdState}
+          onPageChange={onPageChange}
         />
         {/* Create Form End */}
       </section>
