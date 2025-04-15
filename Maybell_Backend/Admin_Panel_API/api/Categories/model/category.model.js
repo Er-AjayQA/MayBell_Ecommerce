@@ -7,6 +7,7 @@ const CategorySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  category_img: { type: String },
   order: { type: Number, min: 0, max: 10000, default: 0 },
   status: {
     type: Boolean,

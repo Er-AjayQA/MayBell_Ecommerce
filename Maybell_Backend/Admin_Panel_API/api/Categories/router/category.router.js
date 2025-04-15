@@ -1,10 +1,27 @@
 // Imports & Configs
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
+const cloudinary = require("../../../helpers/cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const CategoryController = require("../controller/category.controllers");
 
+// Configure Cloudinary storage for Multer
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "ecommerce/categories", // Your desired folder in Cloudinary
+    allowed_formats: ["jpg", "jpeg", "png", "gif"], // Allowed file formats
+    transformation: [{ width: 500, height: 500, crop: "limit" }], // Optional transformations
+  },
+});
+
+const upload = multer({ storage: storage });
+
+const singleImage = upload.single("category_img");
+
 // Define Routes
-router.post("/create", CategoryController.create);
+router.post("/create", singleImage, CategoryController.create);
 router.post("/get-all", CategoryController.getAll);
 router.post("/get-details/:id", CategoryController.getDetails);
 router.put("/update/:id", CategoryController.update);

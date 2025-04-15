@@ -2,11 +2,15 @@ import { IoClose } from "react-icons/io5";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import $ from "jquery";
+import "dropify/dist/css/dropify.min.css";
+import "dropify/dist/js/dropify.min.js";
 import { useEffect } from "react";
 import {
   createCategoryService,
   updateCategoryService,
 } from "../../../Services/CategoryServices";
+import { toFormData } from "axios";
 
 export const AddCategory = ({
   openCreateForm,
@@ -18,6 +22,17 @@ export const AddCategory = ({
   setUpdateIdState,
   setUpdateId,
 }) => {
+  useEffect(() => {
+    $(".dropify").dropify({
+      messages: {
+        default: "Drag and drop ",
+        replace: "Drag and drop ",
+        remove: "Remove",
+        error: "Oops, something went wrong",
+      },
+    });
+  }, []);
+
   const {
     register,
     handleSubmit,
@@ -27,6 +42,10 @@ export const AddCategory = ({
   } = useForm();
 
   const onSubmit = async (data) => {
+    if (data.category_img) {
+      data.category_img = data.category_img[0];
+    }
+
     if (updateIdState) {
       const response = await updateCategoryService(updateId, data);
 
@@ -41,7 +60,7 @@ export const AddCategory = ({
         toast.error(response.message);
       }
     } else {
-      const response = await createCategoryService(data);
+      const response = await createCategoryService(toFormData(data));
 
       if (response.success) {
         toast.success(response.message);
@@ -104,10 +123,31 @@ export const AddCategory = ({
             >
               <div className="mb-5">
                 <label
+                  htmlFor="image"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Category Image
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  {...register("category_img", {
+                    required: "Category image is required",
+                  })}
+                  id="categoryImage"
+                  className="dropify"
+                  data-height="250"
+                />
+                {errors.image && (
+                  <p className="text-red-500">{errors.image.message}</p>
+                )}
+              </div>
+              <div className="mb-5">
+                <label
                   htmlFor="name"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  Name
+                  Category Name
                 </label>
                 <input
                   type="text"
@@ -115,7 +155,7 @@ export const AddCategory = ({
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="category name"
                   {...register("name", {
-                    required: "Color name is required",
+                    required: "Category name is required",
                   })}
                 />
                 {errors.name && (

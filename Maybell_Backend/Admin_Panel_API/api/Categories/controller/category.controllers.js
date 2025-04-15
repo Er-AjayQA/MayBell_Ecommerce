@@ -33,9 +33,18 @@ exports.create = async (req, res) => {
       });
     }
 
+    if (!req.file) {
+      return res.status(201).json({
+        success: false,
+        message: "Image is required!!",
+        data: [],
+      });
+    }
+
     const data = {
       name,
       order: order ? order : lastOrderValue,
+      category_img: req.file.path,
     };
 
     const createData = await CategoryModel.create(data);
