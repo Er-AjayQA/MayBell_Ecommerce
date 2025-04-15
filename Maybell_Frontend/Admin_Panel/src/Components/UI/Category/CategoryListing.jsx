@@ -1,18 +1,18 @@
 import { Table, Checkbox, Tooltip, Pagination } from "flowbite-react";
 import { useState } from "react";
-import { AiOutlineSwap } from "react-icons/ai";
+import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+} from "flowbite-react";
 import { FaFilePdf } from "react-icons/fa";
 import { MdOutlineSwapVert, MdDeleteForever, MdEdit } from "react-icons/md";
 import { GrDocumentCsv } from "react-icons/gr";
 import { RiDeleteBin5Fill } from "react-icons/ri";
-import { TbArrowsSort } from "react-icons/tb";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
-import {
-  changeColorsStatusService,
-  deleteColorService,
-  deleteMultipleColorsService,
-} from "../../../Services/ColorServices";
 import {
   changeCategoryStatusService,
   deleteCategoryService,
@@ -33,6 +33,7 @@ export const CategoryTableListing = ({
   setSort,
 }) => {
   const [selectedRecords, setSelectedRecords] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
 
   // Handle Checkbox Check
   const handleCheckboxSelection = (id) => {
@@ -195,6 +196,7 @@ export const CategoryTableListing = ({
                 />
               </Table.HeadCell>
               <Table.HeadCell>Name</Table.HeadCell>
+              <Table.HeadCell>Banner Image</Table.HeadCell>
               <Table.HeadCell>Order</Table.HeadCell>
               <Table.HeadCell>Status</Table.HeadCell>
               <Table.HeadCell>Action</Table.HeadCell>
@@ -221,6 +223,43 @@ export const CategoryTableListing = ({
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                         {category?.name}
+                      </Table.Cell>
+                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                        {category?.category_img ? (
+                          <>
+                            <img
+                              src={category?.category_img}
+                              className="w-[50px] h-[50px] mx-auto cursor-pointer"
+                              onClick={() => setOpenModal(true)}
+                            />
+                            <Modal
+                              show={openModal}
+                              onClose={() => setOpenModal(false)}
+                            >
+                              <ModalHeader>Category Banner Image</ModalHeader>
+                              <ModalBody>
+                                <div className="space-y-6">
+                                  <img
+                                    src={category?.category_img}
+                                    className="w-[350px] h-[350px] mx-auto"
+                                    onClick={() => setOpenModal(true)}
+                                  />
+                                </div>
+                              </ModalBody>
+                              <ModalFooter>
+                                <Button
+                                  color="gray"
+                                  onClick={() => setOpenModal(false)}
+                                  className="mx-auto"
+                                >
+                                  Close
+                                </Button>
+                              </ModalFooter>
+                            </Modal>
+                          </>
+                        ) : (
+                          "N/A"
+                        )}
                       </Table.Cell>
                       <Table.Cell>{category?.order}</Table.Cell>
                       <Table.Cell>

@@ -42,12 +42,12 @@ export const AddCategory = ({
   } = useForm();
 
   const onSubmit = async (data) => {
-    if (data.category_img) {
-      data.category_img = data.category_img[0];
+    if (data.categoryImage) {
+      data.categoryImage = data.categoryImage[0];
     }
 
     if (updateIdState) {
-      const response = await updateCategoryService(updateId, data);
+      const response = await updateCategoryService(updateId, toFormData(data));
 
       if (response.success) {
         toast.success(response.message);
@@ -83,10 +83,12 @@ export const AddCategory = ({
     if (updateIdState && categoryDetails) {
       setValue("name", categoryDetails.name);
       setValue("order", categoryDetails.order);
+      setValue("categoryImage", categoryDetails.category_img);
     } else {
       reset({
         name: "",
         order: "",
+        categoryImage: "",
       });
     }
   }, [updateIdState, categoryDetails, setValue, reset]);
@@ -123,24 +125,20 @@ export const AddCategory = ({
             >
               <div className="mb-5">
                 <label
-                  htmlFor="image"
+                  htmlFor="categoryImage"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  Category Image
+                  Category Banner Image
                 </label>
                 <input
                   type="file"
                   accept="image/*"
-                  {...register("category_img", {
-                    required: "Category image is required",
-                  })}
+                  name="categoryImage"
                   id="categoryImage"
                   className="dropify"
                   data-height="250"
+                  {...register("categoryImage")}
                 />
-                {errors.image && (
-                  <p className="text-red-500">{errors.image.message}</p>
-                )}
               </div>
               <div className="mb-5">
                 <label

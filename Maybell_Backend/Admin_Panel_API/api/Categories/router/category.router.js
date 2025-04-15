@@ -7,6 +7,7 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const CategoryController = require("../controller/category.controllers");
 
 // Configure Cloudinary storage for Multer
+
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
@@ -16,9 +17,9 @@ const storage = new CloudinaryStorage({
   },
 });
 
-const upload = multer({ storage: storage });
+const categoryImages = multer({ storage: storage });
 
-const singleImage = upload.single("category_img");
+const singleImage = categoryImages.single("categoryImage");
 
 // Define Routes
 router.post("/create", singleImage, CategoryController.create);
