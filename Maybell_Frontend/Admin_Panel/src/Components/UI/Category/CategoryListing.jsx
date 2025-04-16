@@ -141,8 +141,8 @@ export const CategoryTableListing = ({
   // Handle Select All Checkboxes
   const handleSelectAllCheckboxes = (event) => {
     if (event.target.checked) {
-      const data = allColors.map((color) => {
-        return color._id;
+      const data = allCategories.map((category) => {
+        return category._id;
       });
       setSelectedRecords(data);
     } else {
@@ -404,16 +404,25 @@ export const CategoryTableListing = ({
             </Table.Body>
           </Table>
         </div>
+        {/* Table Listing End */}
+
+        {/* Pagination Start */}
         {
           <div className="flex justify-between items-center mt-3">
             <div className="flex justify-center items-center gap-2 text-sm text-gray-700 dark:text-gray-400">
               Showing
               <span className="font-semibold text-gray-900 dark:text-white">
-                1
+                {Math.min(
+                  (currentPage - 1) * (filterData.perPage || 10) + 1,
+                  totalRecords
+                )}
               </span>
               to
               <span className="font-semibold text-gray-900 dark:text-white">
-                {allCategories.length}
+                {Math.min(
+                  currentPage * (filterData.perPage || 10),
+                  totalRecords
+                )}
               </span>
               of
               <span className="font-semibold text-gray-900 dark:text-white">
@@ -432,10 +441,7 @@ export const CategoryTableListing = ({
             )}
           </div>
         }
-
-        {/* Pagination would go here */}
-
-        {/* Table Listing End */}
+        {/* Pagination End */}
       </div>
       {/* Table Section End */}
     </>

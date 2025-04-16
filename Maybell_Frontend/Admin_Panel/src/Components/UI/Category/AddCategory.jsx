@@ -2,6 +2,7 @@ import { IoClose } from "react-icons/io5";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import { Spinner } from "flowbite-react";
 import $ from "jquery";
 import "dropify/dist/css/dropify.min.css";
 import "dropify/dist/js/dropify.min.js";
@@ -206,7 +207,20 @@ export const AddCategory = ({
                   }`}
                   disabled={isLoading ? "disabled" : ""}
                 >
-                  {updateIdState ? "Update" : "Create"}
+                  {isLoading ? (
+                    <>
+                      <Spinner
+                        aria-label="Spinner button example"
+                        size="sm"
+                        light
+                      />
+                      <span className="pl-3">Loading...</span>
+                    </>
+                  ) : updateIdState ? (
+                    "Update"
+                  ) : (
+                    "Create"
+                  )}
                 </button>
               </div>
             </form>
