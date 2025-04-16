@@ -3,7 +3,6 @@ import { FaPlus, FaFilter } from "react-icons/fa";
 import { MdFilterAltOff } from "react-icons/md";
 import { BreadCrumb } from "../../UI/Breadcrumb";
 import { Link } from "react-router-dom";
-import { getColorsDetailById } from "../../../Services/ColorServices";
 import {
   getAllCategoryService,
   getCategoryDetailById,

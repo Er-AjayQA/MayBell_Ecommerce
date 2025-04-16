@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import $ from "jquery";
 import "dropify/dist/css/dropify.min.css";
 import "dropify/dist/js/dropify.min.js";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   createCategoryService,
   updateCategoryService,
@@ -35,8 +35,11 @@ export const AddCategory = ({
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      if (data.categoryImage) {
+      if (data.categoryImage && data.categoryImage[0]) {
         data.categoryImage = data.categoryImage[0];
+      } else if (updateIdState && !data.categoryImage) {
+        // If in update mode and no new image is selected, keep the existing image
+        data.categoryImage = categoryDetails.category_img;
       }
 
       let response;
@@ -142,7 +145,7 @@ export const AddCategory = ({
                   name="categoryImage"
                   id="categoryImage"
                   className="dropify"
-                  data-height="250"
+                  data-height="200"
                   {...register("categoryImage")}
                 />
               </div>

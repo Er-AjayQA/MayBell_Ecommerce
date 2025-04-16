@@ -1,5 +1,8 @@
 import { Table, Checkbox, Tooltip, Pagination } from "flowbite-react";
 import { useState } from "react";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable"; // Import autoTable separately
+import Papa from "papaparse";
 import {
   Button,
   Modal,
@@ -35,6 +38,81 @@ export const CategoryTableListing = ({
   const [selectedRecords, setSelectedRecords] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [currentModalImage, setCurrentModalImage] = useState(null);
+
+  // Handle Download CSV
+  const handleDownloadCSV = () => {
+    const dataToExport = allCategories.map((category) => ({
+      Name: category.name,
+      "Banner Image": category.category_img || "N/A",
+      Order: category.order || "N/A",
+      Status: category.status ? "Active" : "Inactive",
+    }));
+
+    const csv = Papa.unparse(dataToExport);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "categories.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Handle Download PDF - Fixed version
+  const handleDownloadPDF = () => {
+    try {
+      const doc = new jsPDF();
+
+      // Add title
+      doc.setFontSize(16);
+      doc.text("Categories List", 14, 15);
+
+      // Prepare data for the table
+      const headers = [["Name", "Category Image", "Order", "Status"]];
+      const tableData = allCategories.map((category) => [
+        category.name,
+        category.category_img ? category.category_img : "No",
+        category.order || "N/A",
+        category.status ? "Active" : "Inactive",
+      ]);
+
+      // Add table using the separately imported autoTable
+      autoTable(doc, {
+        theme: "grid",
+        head: headers,
+        body: tableData,
+        startY: 25,
+        styles: {
+          cellPadding: 3,
+          fontSize: 9,
+          valign: "middle",
+          halign: "center",
+        },
+        headStyles: {
+          fillColor: [62, 142, 247],
+          textColor: 255,
+          fontStyle: "bold",
+          cellWidth: "wrap",
+        },
+        alternateRowStyles: {
+          fillColor: [240, 240, 240],
+        },
+        columnStyles: {
+          1: {
+            // This is the index of the "Category Image" column (0-based)
+            cellWidth: 60, // Set your desired fixed width here (in mm)
+          },
+        },
+      });
+
+      // Save the PDF
+      doc.save("categories.pdf");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("Failed to generate PDF");
+    }
+  };
 
   // Handle Open Modal
   const handleOpenModal = (img) => {
@@ -177,12 +255,18 @@ export const CategoryTableListing = ({
                 </button>
               </Tooltip>
               <Tooltip content="Download CSV" placement="top">
-                <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200">
+                <button
+                  className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200"
+                  onClick={handleDownloadCSV}
+                >
                   <GrDocumentCsv />
                 </button>
               </Tooltip>
               <Tooltip content="Download PDF" placement="top">
-                <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200">
+                <button
+                  className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200"
+                  onClick={handleDownloadPDF}
+                >
                   <FaFilePdf />
                 </button>
               </Tooltip>
