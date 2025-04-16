@@ -34,6 +34,19 @@ export const CategoryTableListing = ({
 }) => {
   const [selectedRecords, setSelectedRecords] = useState([]);
   const [openModal, setOpenModal] = useState(false);
+  const [currentModalImage, setCurrentModalImage] = useState(null);
+
+  // Handle Open Modal
+  const handleOpenModal = (img) => {
+    setOpenModal(true);
+    setCurrentModalImage(img);
+  };
+
+  // Handle Close Modal
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setCurrentModalImage(null);
+  };
 
   // Handle Checkbox Check
   const handleCheckboxSelection = (id) => {
@@ -230,17 +243,16 @@ export const CategoryTableListing = ({
                             <img
                               src={category?.category_img}
                               className="w-[50px] h-[50px] mx-auto cursor-pointer"
-                              onClick={() => setOpenModal(true)}
+                              onClick={() => {
+                                handleOpenModal(category?.category_img);
+                              }}
                             />
-                            <Modal
-                              show={openModal}
-                              onClose={() => setOpenModal(false)}
-                            >
+                            <Modal show={openModal} onClose={handleCloseModal}>
                               <ModalHeader>Category Banner Image</ModalHeader>
                               <ModalBody>
                                 <div className="space-y-6">
                                   <img
-                                    src={category?.category_img}
+                                    src={currentModalImage}
                                     className="w-[350px] h-[350px] mx-auto"
                                     onClick={() => setOpenModal(true)}
                                   />
@@ -249,7 +261,7 @@ export const CategoryTableListing = ({
                               <ModalFooter>
                                 <Button
                                   color="gray"
-                                  onClick={() => setOpenModal(false)}
+                                  onClick={handleCloseModal}
                                   className="mx-auto"
                                 >
                                   Close

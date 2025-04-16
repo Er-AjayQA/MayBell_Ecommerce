@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import $ from "jquery";
 import "dropify/dist/css/dropify.min.css";
 import "dropify/dist/js/dropify.min.js";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   createCategoryService,
   updateCategoryService,
@@ -22,54 +22,48 @@ export const AddCategory = ({
   setUpdateIdState,
   setUpdateId,
 }) => {
-  useEffect(() => {
-    $(".dropify").dropify({
-      messages: {
-        default: "Drag and drop ",
-        replace: "Drag and drop ",
-        remove: "Remove",
-        error: "Oops, something went wrong",
-      },
-    });
-  }, []);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
     setValue,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm();
 
   const onSubmit = async (data) => {
-    if (data.categoryImage) {
-      data.categoryImage = data.categoryImage[0];
-    }
+    setIsLoading(true);
+    try {
+      if (data.categoryImage) {
+        data.categoryImage = data.categoryImage[0];
+      }
 
-    if (updateIdState) {
-      const response = await updateCategoryService(updateId, toFormData(data));
+      let response;
+
+      if (updateIdState) {
+        response = await updateCategoryService(updateId, toFormData(data));
+      } else {
+        response = await createCategoryService(toFormData(data));
+      }
 
       if (response.success) {
         toast.success(response.message);
         reset();
         createForm();
         getAllCategoryData();
-        setUpdateIdState(false);
-        setUpdateId(null);
+        if (updateIdState) {
+          setUpdateIdState(false);
+          setUpdateId(null);
+        }
       } else {
         toast.error(response.message);
+        setIsLoading(false);
       }
-    } else {
-      const response = await createCategoryService(toFormData(data));
-
-      if (response.success) {
-        toast.success(response.message);
-        reset();
-        createForm();
-        getAllCategoryData();
-      } else {
-        toast.error(response.message);
-      }
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
+    } finally {
+      setIsLoading(false); // Ensure loading is false when done
     }
   };
 
@@ -92,6 +86,18 @@ export const AddCategory = ({
       });
     }
   }, [updateIdState, categoryDetails, setValue, reset]);
+
+  // Handle Dropify Logic
+  useEffect(() => {
+    $(".dropify").dropify({
+      messages: {
+        default: "Drag and drop ",
+        replace: "Drag and drop ",
+        remove: "Remove",
+        error: "Oops, something went wrong",
+      },
+    });
+  }, []);
 
   return (
     <>
@@ -190,7 +196,12 @@ export const AddCategory = ({
                 </Link>
                 <button
                   type="submit"
-                  className="text-white bg-[#3e8ef7] hover:bg-[#589ffc] focus:ring-none focus:outline-none font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
+                  className={`text-white bg-[#3e8ef7] hover:bg-[#589ffc] focus:ring-none focus:outline-none font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center ${
+                    isLoading
+                      ? "cursor-not-allowed bg-[#91b2dd] hover:bg-[#91b2dd]"
+                      : "cursor-pointer"
+                  }`}
+                  disabled={isLoading ? "disabled" : ""}
                 >
                   {updateIdState ? "Update" : "Create"}
                 </button>
