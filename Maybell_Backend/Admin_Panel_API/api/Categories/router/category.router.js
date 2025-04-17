@@ -12,7 +12,7 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: "ecommerce/categories", // Your desired folder in Cloudinary
-    allowed_formats: ["jpg", "jpeg", "png", "gif"], // Allowed file formats
+    allowed_formats: ["jpg", "jpeg", "png", "gif", "webp"], // Allowed file formats
     transformation: [{ width: 500, height: 500, crop: "limit" }], // Optional transformations
   },
 });

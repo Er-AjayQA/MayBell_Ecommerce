@@ -25,6 +25,16 @@ export const AddCategory = ({
   currentImage,
   setCurrentImage,
 }) => {
+  const [imageValue, setImageValue] = useState("");
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm();
+
   // Handle Dropify Logic
   useEffect(() => {
     const dropifyElement = $("#categoryImage");
@@ -40,53 +50,36 @@ export const AddCategory = ({
         class="dropify" data-height="250" data-default-file="${currentImage}"/>`
     );
 
-    // ** Reinitialize Dropify **
+    // **Reinitialize Dropify**
     $("#categoryImage").dropify();
 
-    // ** Update React Hook Form when File Changes **
+    // **Update React Hook Form when File Changes**
     $("#categoryImage").on("change", function (event) {
       if (event.target.files.length > 0) {
-        setValue("categoryImage", event.target.files[0]);
+        console.log(event.target.files[0]);
+        setImageValue(event.target.files[0]); // ✅ Sync React Hook Form
       }
     });
   }, [currentImage]);
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm();
-
   const onSubmit = async (data) => {
     try {
       setIsLoading(true);
-      // Create FormData object
-      const formData = new FormData();
 
-      // Add form fields
-      if (data.name) formData.append("name", data.name);
-      if (data.order) formData.append("order", data.order);
-
-      // Add file if exists
-      if (data.categoryImage?.[0]) {
-        formData.append("categoryImage", data.categoryImage[0]);
-      } else if (updateIdState && data.categoryImage) {
-        // Keep existing image if updating without changing it
-        formData.append("categoryImage", data.categoryImage);
+      if (imageValue) {
+        data.categoryImage = imageValue;
       }
 
       let response;
 
       if (updateIdState) {
         console.log("Update Scenario ======", data);
-        response = await updateCategoryService(updateId, formData);
+        response = await updateCategoryService(updateId, toFormData(data));
       } else {
         console.log("New Record Scenario ======", data);
-        response = await createCategoryService(formData);
+        response = await createCategoryService(toFormData(data));
       }
 
       if (response.success) {
@@ -168,11 +161,12 @@ export const AddCategory = ({
                 <input
                   type="file"
                   accept="image/*"
-                  name="categoryImage"
+                  // {...register("image", { required: "Category image is required" })}
                   id="categoryImage"
+                  name="categoryImage"
+                  data-default-file={currentImage}
                   className="dropify"
-                  data-height="200"
-                  {...register("categoryImage")}
+                  data-height="250"
                 />
               </div>
               <div className="mb-5">
