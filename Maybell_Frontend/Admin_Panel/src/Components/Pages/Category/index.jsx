@@ -24,6 +24,7 @@ export const Category = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(null);
   const [sort, setSort] = useState(false);
+  const [currentImage, setCurrentImage] = useState(null);
 
   // Handle On Page Change
   const onPageChange = (page) => {
@@ -95,6 +96,7 @@ export const Category = () => {
     const response = await getCategoryDetailById(updateId);
     if (response.success) {
       setCategoryDetails(response.data);
+      setCurrentImage(response.data.category_img);
     }
   };
 
@@ -188,6 +190,8 @@ export const Category = () => {
           setUpdateId={setUpdateId}
           setUpdateIdState={setUpdateIdState}
           onPageChange={onPageChange}
+          currentImage={currentImage}
+          setCurrentImage={setCurrentImage}
         />
         {/* Create Form End */}
       </section>

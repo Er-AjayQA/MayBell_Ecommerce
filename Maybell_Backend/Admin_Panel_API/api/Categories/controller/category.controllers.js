@@ -1,10 +1,15 @@
 // Imports & Configs
+// const slugify = require("slugify");
+// const { generateUniqueSlug } = require("../../../helpers/utility");
 const CategoryModel = require("../model/category.model");
+const { generateSlug } = require("../../../helpers/utility");
 
 // Create New Data
 exports.create = async (req, res) => {
   try {
     const { name, order } = req.body;
+
+    // slug = await generateUniqueSlug(CategoryModel, slug); // Used if multiple categories created with same name, but here I have already a validation that category name will be unique
 
     let lastOrderValue = 1;
 
@@ -33,10 +38,12 @@ exports.create = async (req, res) => {
       });
     }
 
+    let slug = generateSlug(name);
     const data = {
       name,
       order: order ? order : lastOrderValue,
       category_img: req?.file?.path,
+      slug,
     };
 
     const createData = await CategoryModel.create(data);
@@ -137,9 +144,7 @@ exports.getDetails = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(req.body);
-    console.log(req.file);
-    return;
+
     const { name, order } = req.body;
 
     const ifAlreadyExist = await CategoryModel.find({
@@ -156,13 +161,15 @@ exports.update = async (req, res) => {
       });
     }
 
+    let slug = generateSlug(name);
+
     const data = {};
     if (name) data.name = name;
     if (order) data.order = order;
 
     const updateData = await CategoryModel.updateOne(
       { _id: id },
-      { $set: { ...data, category_img: req.file.path } }
+      { $set: { ...data, slug, category_img: req.file.path } }
     );
 
     return res.status(201).json({

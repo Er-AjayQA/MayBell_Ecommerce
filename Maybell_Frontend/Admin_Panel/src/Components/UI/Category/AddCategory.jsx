@@ -22,7 +22,35 @@ export const AddCategory = ({
   updateIdState,
   setUpdateIdState,
   setUpdateId,
+  currentImage,
+  setCurrentImage,
 }) => {
+  // Handle Dropify Logic
+  useEffect(() => {
+    const dropifyElement = $("#categoryImage");
+
+    if (dropifyElement.data("dropify")) {
+      dropifyElement.data("dropify").destroy();
+      dropifyElement.removeData("dropify");
+    }
+
+    // **Force Update Dropify Input**
+    dropifyElement.replaceWith(
+      `<input type="file" accept="image/*" name="image" id="categoryImage"
+        class="dropify" data-height="250" data-default-file="${currentImage}"/>`
+    );
+
+    // ** Reinitialize Dropify **
+    $("#categoryImage").dropify();
+
+    // ** Update React Hook Form when File Changes **
+    $("#categoryImage").on("change", function (event) {
+      if (event.target.files.length > 0) {
+        setValue("image", event.target.files[0]);
+      }
+    });
+  }, [currentImage]);
+
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -34,11 +62,11 @@ export const AddCategory = ({
   } = useForm();
 
   const onSubmit = async (data) => {
-    setIsLoading(true);
     try {
+      setIsLoading(true);
       if (data.categoryImage && data.categoryImage[0]) {
         data.categoryImage = data.categoryImage[0];
-      } else if (updateIdState && !data.categoryImage) {
+      } else if (updateIdState && data.categoryImage) {
         // If in update mode and no new image is selected, keep the existing image
         data.categoryImage = categoryDetails.category_img;
       }
@@ -46,9 +74,10 @@ export const AddCategory = ({
       let response;
 
       if (updateIdState) {
-        response = await updateCategoryService(updateId, toFormData(data));
+        console.log("Update Scenario ======", data);
+        response = await updateCategoryService(updateId, toFormData({ data }));
       } else {
-        response = await createCategoryService(toFormData(data));
+        response = await createCategoryService(toFormData({ data }));
       }
 
       if (response.success) {
@@ -81,27 +110,14 @@ export const AddCategory = ({
     if (updateIdState && categoryDetails) {
       setValue("name", categoryDetails.name);
       setValue("order", categoryDetails.order);
-      setValue("categoryImage", categoryDetails.category_img);
     } else {
       reset({
         name: "",
         order: "",
-        categoryImage: "",
       });
+      setCurrentImage(null);
     }
   }, [updateIdState, categoryDetails, setValue, reset]);
-
-  // Handle Dropify Logic
-  useEffect(() => {
-    $(".dropify").dropify({
-      messages: {
-        default: "Drag and drop ",
-        replace: "Drag and drop ",
-        remove: "Remove",
-        error: "Oops, something went wrong",
-      },
-    });
-  }, []);
 
   return (
     <>
@@ -143,7 +159,6 @@ export const AddCategory = ({
                 <input
                   type="file"
                   accept="image/*"
-                  name="categoryImage"
                   id="categoryImage"
                   className="dropify"
                   data-height="200"

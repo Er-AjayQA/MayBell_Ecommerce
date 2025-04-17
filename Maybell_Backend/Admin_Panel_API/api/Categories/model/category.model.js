@@ -7,6 +7,9 @@ const CategorySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  slug: {
+    type: String,
+  },
   category_img: { type: String },
   order: { type: Number, min: 0, max: 10000, default: 0 },
   status: {
