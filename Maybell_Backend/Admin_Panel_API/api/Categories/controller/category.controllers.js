@@ -147,6 +147,8 @@ exports.update = async (req, res) => {
 
     const { name, order } = req.body;
 
+    console.log(req.file);
+
     const ifAlreadyExist = await CategoryModel.find({
       _id: { $ne: id },
       deletedAt: null,
@@ -169,7 +171,9 @@ exports.update = async (req, res) => {
 
     const updateData = await CategoryModel.updateOne(
       { _id: id },
-      { $set: { ...data, slug, category_img: req.file.path } }
+      {
+        $set: { ...data, slug, category_img: req?.file ? req?.file?.path : {} },
+      }
     );
 
     return res.status(201).json({

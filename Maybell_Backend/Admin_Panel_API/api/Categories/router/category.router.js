@@ -25,7 +25,7 @@ const singleImage = categoryImages.single("categoryImage");
 router.post("/create", singleImage, CategoryController.create);
 router.post("/get-all", CategoryController.getAll);
 router.post("/get-details/:id", CategoryController.getDetails);
-router.put("/update/:id", CategoryController.update);
+router.put("/update/:id", singleImage, CategoryController.update);
 router.put("/update-status", CategoryController.updateStatus);
 router.put("/delete", CategoryController.delete);
 router.put("/delete-multiple", CategoryController.deleteMultiple);
