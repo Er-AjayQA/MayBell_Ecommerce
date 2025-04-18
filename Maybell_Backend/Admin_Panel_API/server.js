@@ -3,7 +3,7 @@ const express = require("express");
 require("dotenv").config();
 const app = express();
 const cors = require("cors");
-const multer = require("multer");
+// const multer = require("multer");
 const PORT = process.env.PORT || 5000;
 const DBConnection = require("./config/db.config");
 
@@ -27,7 +27,7 @@ app.use(
   })
 );
 
-app.use(multer().any()); // Handle multipart/form-data
+// app.use(multer().any()); // Handle multipart/form-data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

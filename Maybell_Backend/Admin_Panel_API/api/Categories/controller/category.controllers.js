@@ -9,8 +9,6 @@ exports.create = async (req, res) => {
   try {
     const { name, order } = req.body;
 
-    // slug = await generateUniqueSlug(CategoryModel, slug); // Used if multiple categories created with same name, but here I have already a validation that category name will be unique
-
     let lastOrderValue = 1;
 
     // Get count to handle empty collection case
