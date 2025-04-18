@@ -151,12 +151,17 @@ exports.update = async (req, res) => {
 
     const { name, order, category_id } = req.body;
 
-    console.log(req.file);
-
     const ifAlreadyExist = await SubCategoryModel.find({
       _id: { $ne: id },
       deletedAt: null,
-      $or: [{ $and: [{ name }, { category_id }] }, { order }],
+      $or: [
+        {
+          $and: [{ name }, { category_id }],
+        },
+        {
+          order,
+        },
+      ],
     });
 
     if (ifAlreadyExist.length > 0) {
@@ -172,6 +177,12 @@ exports.update = async (req, res) => {
     const data = {};
     if (name) data.name = name;
     if (order) data.order = order;
+    if (category_id) data.category_id = category_id;
+
+    // Handle file upload
+    if (req.file) {
+      data.subCategory_img = req.file.path;
+    }
 
     const updateData = await SubCategoryModel.updateOne(
       { _id: id },
@@ -179,7 +190,6 @@ exports.update = async (req, res) => {
         $set: {
           ...data,
           slug,
-          subCategory_img: req?.file ? req?.file?.path : {},
         },
       }
     );
@@ -203,7 +213,7 @@ exports.updateStatus = async (req, res) => {
   try {
     const { id } = req.body;
 
-    const updateData = await CategoryModel.updateOne({ _id: id }, [
+    const updateData = await SubCategoryModel.updateOne({ _id: id }, [
       { $set: { status: { $not: "$status" } } },
     ]);
 

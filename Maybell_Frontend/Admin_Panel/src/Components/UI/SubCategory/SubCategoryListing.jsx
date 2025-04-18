@@ -17,11 +17,7 @@ import { RiDeleteBin5Fill } from "react-icons/ri";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import {
-  changeCategoryStatusService,
-  deleteCategoryService,
-  deleteMultipleCategoryService,
-} from "../../../Services/CategoryServices";
-import {
+  changeSubCategoryStatusService,
   deleteMultipleSubCategoryService,
   deleteSubCategoryService,
 } from "../../../Services/SubCategoryServices";
@@ -155,9 +151,9 @@ export const SubCategoryTableListing = ({
     }
   };
 
-  // Change Status of Materials
+  // Change Status of SubCategory
   const handleStatusChange = async (id) => {
-    const response = await changeCategoryStatusService({ id });
+    const response = await changeSubCategoryStatusService({ id });
 
     if (response.success) {
       toast.success(response.message);
@@ -308,11 +304,11 @@ export const SubCategoryTableListing = ({
             <Table.Body className="divide-y ">
               {allSubCategories?.length >= 1 ? (
                 allSubCategories.map((subCategory) => {
-                  let parentCategory = allCategoriesData.filter(
-                    (category) => category?._id === subCategory?.category_id
-                  );
-
-                  console.log(parentCategory);
+                  let parentCategory = allCategoriesData.find((category) => {
+                    if (category?._id === subCategory?.category_id) {
+                      return category;
+                    }
+                  });
 
                   return (
                     <Table.Row
@@ -336,7 +332,7 @@ export const SubCategoryTableListing = ({
                         {subCategory?.name}
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                        {parentCategory[0]?.name}
+                        {parentCategory?.name}
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                         {subCategory?.subCategory_img ? (

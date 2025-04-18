@@ -69,18 +69,26 @@ export const AddSubCategory = ({
     try {
       setIsLoading(true);
 
+      const formData = new FormData();
+
+      // Append all form data
+      formData.append("name", data.name);
+      formData.append("order", data.order);
+      formData.append("category_id", data.category_id);
+
+      // Only append the file if it exists
       if (imageValue) {
-        data.categoryImage = imageValue;
+        formData.append("categoryImage", imageValue);
       }
 
       let response;
 
       if (updateIdState) {
         console.log("Update Scenario ======", data);
-        response = await updateSubCategoryService(updateId, toFormData(data));
+        response = await updateSubCategoryService(updateId, formData);
       } else {
         console.log("New Record Scenario ======", data);
-        response = await createSubCategoryService(toFormData(data));
+        response = await createSubCategoryService(formData);
       }
 
       if (response.success) {
