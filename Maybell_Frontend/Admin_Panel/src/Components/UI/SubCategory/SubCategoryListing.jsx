@@ -21,8 +21,13 @@ import {
   deleteCategoryService,
   deleteMultipleCategoryService,
 } from "../../../Services/CategoryServices";
+import {
+  deleteMultipleSubCategoryService,
+  deleteSubCategoryService,
+} from "../../../Services/SubCategoryServices";
 
 export const SubCategoryTableListing = ({
+  allCategoriesData,
   allSubCategories,
   getAllSubCategoryData,
   filterData,
@@ -160,9 +165,9 @@ export const SubCategoryTableListing = ({
     }
   };
 
-  // Handle Delete Materials
+  // Handle Delete SubCategory
   const handleDeleteCategory = async (id) => {
-    const response = await deleteCategoryService({ id });
+    const response = await deleteSubCategoryService({ id });
 
     if (response.success) {
       toast.success(response.message);
@@ -172,7 +177,7 @@ export const SubCategoryTableListing = ({
 
   // Handle Delete Multiple Data
   const handleDeleteMultipleCategories = async () => {
-    const response = await deleteMultipleCategoryService({
+    const response = await deleteMultipleSubCategoryService({
       ids: selectedRecords,
     });
 
@@ -293,8 +298,8 @@ export const SubCategoryTableListing = ({
                 />
               </Table.HeadCell>
               <Table.HeadCell>Name</Table.HeadCell>
-              <Table.HeadCell>Category Id</Table.HeadCell>
-              <Table.HeadCell>SubCategory Image</Table.HeadCell>
+              <Table.HeadCell>Parent Category</Table.HeadCell>
+              <Table.HeadCell>Sub-Category Image</Table.HeadCell>
               <Table.HeadCell>Order</Table.HeadCell>
               <Table.HeadCell>Status</Table.HeadCell>
               <Table.HeadCell>Action</Table.HeadCell>
@@ -302,37 +307,45 @@ export const SubCategoryTableListing = ({
 
             <Table.Body className="divide-y ">
               {allSubCategories?.length >= 1 ? (
-                allSubCategories.map((category) => {
+                allSubCategories.map((subCategory) => {
+                  let parentCategory = allCategoriesData.filter(
+                    (category) => category?._id === subCategory?.category_id
+                  );
+
+                  console.log(parentCategory);
+
                   return (
                     <Table.Row
                       className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center"
-                      key={category?._id}
+                      key={subCategory?._id}
                     >
                       <Table.Cell className="p-4">
                         <Checkbox
                           defaultChecked="false"
-                          onClick={() => handleCheckboxSelection(category?._id)}
+                          onClick={() =>
+                            handleCheckboxSelection(subCategory?._id)
+                          }
                           checked={
-                            selectedRecords.includes(category?._id)
+                            selectedRecords.includes(subCategory?._id)
                               ? "checked"
                               : ""
                           }
                         />
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                        {category?.name}
+                        {subCategory?.name}
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                        {category?.category_id}
+                        {parentCategory[0]?.name}
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                        {category?.category_img ? (
+                        {subCategory?.subCategory_img ? (
                           <>
                             <img
-                              src={category?.category_img}
+                              src={subCategory?.subCategory_img}
                               className="w-[50px] h-[50px] mx-auto cursor-pointer"
                               onClick={() => {
-                                handleOpenModal(category?.category_img);
+                                handleOpenModal(subCategory?.subCategory_img);
                               }}
                             />
                             <Modal show={openModal} onClose={handleCloseModal}>
@@ -363,15 +376,15 @@ export const SubCategoryTableListing = ({
                           "N/A"
                         )}
                       </Table.Cell>
-                      <Table.Cell>{category?.order}</Table.Cell>
+                      <Table.Cell>{subCategory?.order}</Table.Cell>
                       <Table.Cell>
                         <div
                           className={`w-[50px] h-[20px] border border-gray-300 m-auto shadow-md rounded-full cursor-pointer flex items-center transition-colors duration-300 ${
-                            category?.status
+                            subCategory?.status
                               ? "bg-green-400 justify-end"
                               : "bg-red-400 justify-start"
                           }`}
-                          onClick={() => handleStatusChange(category?._id)}
+                          onClick={() => handleStatusChange(subCategory?._id)}
                         >
                           <span
                             className={`w-[24px] h-[18px] bg-white border-solid border-[1px] border-black rounded-full shadow-inner transform transition-transform duration-300`}
@@ -381,17 +394,19 @@ export const SubCategoryTableListing = ({
                       <Table.Cell>
                         <div className="flex justify-center items-center gap-2">
                           <Link
-                            to={`/furniture/admin-panel/categories/update/${category?._id}`}
+                            to={`/furniture/admin-panel/sub-categories/update/${subCategory?._id}`}
                             className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-green-400 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out"
                             onClick={() =>
-                              handleUpdateId(category?._id, "update")
+                              handleUpdateId(subCategory?._id, "update")
                             }
                           >
                             <MdEdit />
                           </Link>
                           <button
                             className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-red-600 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out"
-                            onClick={() => handleDeleteCategory(category?._id)}
+                            onClick={() =>
+                              handleDeleteCategory(subCategory?._id)
+                            }
                           >
                             <MdDeleteForever />
                           </button>

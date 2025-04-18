@@ -7,12 +7,17 @@ import { getAllCategoryService } from "../../../Services/CategoryServices";
 import { SubCategoryFilterForm } from "../../UI/SubCategory/SubCategoryFilterForm";
 import { SubCategoryTableListing } from "../../UI/SubCategory/SubCategoryListing";
 import { AddSubCategory } from "../../UI/SubCategory/AddSubCategory";
-import { getSubCategoryDetailById } from "../../../Services/SubCategoryServices";
+import {
+  getAllSubCategoryService,
+  getSubCategoryDetailById,
+} from "../../../Services/SubCategoryServices";
 
 export const SubCategory = () => {
   const [openCreateForm, setOpenCreateForm] = useState(false);
   const [filterFormStatus, setFilterFormStatus] = useState(false);
   const [filterData, setFilterData] = useState({ name: "", code: "" });
+  const [allActiveCategoriesList, setAllActiveCategoriesList] = useState([]);
+  const [allCategoriesData, setAllCategoriesData] = useState([]);
   const [allSubCategories, setAllSubCategories] = useState([]);
   const [updateId, setUpdateId] = useState(null);
   const [subCategoryDetails, setSubCategoryDetails] = useState([]);
@@ -56,9 +61,38 @@ export const SubCategory = () => {
     setFilterData({ name: "", code: "" });
   };
 
-  // Get All Existing Materials
-  const getAllSubCategoryData = async () => {
+  // Get All Existing Categories
+  const getAllCategoryData = async () => {
     const response = await getAllCategoryService({
+      ...filterData,
+      limit: 1000,
+      page: 1,
+      sort: sort,
+    });
+
+    if (response.success) {
+      setAllCategoriesData(response.data);
+    }
+  };
+
+  // Get All Existing Active Categories
+  const getAllActiveCategoryData = async () => {
+    const response = await getAllCategoryService({
+      ...filterData,
+      limit: 1000,
+      page: 1,
+      sort: sort,
+      status: true,
+    });
+
+    if (response.success) {
+      setAllActiveCategoriesList(response.data);
+    }
+  };
+
+  // Get All Existing SubCategories
+  const getAllSubCategoryData = async () => {
+    const response = await getAllSubCategoryService({
       ...filterData,
       limit: currentLimit,
       page: currentPage,
@@ -94,12 +128,14 @@ export const SubCategory = () => {
     const response = await getSubCategoryDetailById(updateId);
     if (response.success) {
       setSubCategoryDetails(response.data);
-      setCurrentImage(response.data.category_img);
+      setCurrentImage(response.data.subCategory_img);
     }
   };
 
   useEffect(() => {
     getAllSubCategoryData();
+    getAllActiveCategoryData();
+    getAllCategoryData();
   }, [filterData, currentLimit, currentPage, sort]);
 
   useEffect(() => {
@@ -164,6 +200,7 @@ export const SubCategory = () => {
         <SubCategoryTableListing
           allSubCategories={allSubCategories}
           filterData={filterData}
+          allCategoriesData={allCategoriesData}
           getAllSubCategoryData={getAllSubCategoryData}
           filterFormData={handleFilterData}
           handleUpdateId={handleUpdateId}
@@ -181,6 +218,8 @@ export const SubCategory = () => {
         <AddSubCategory
           openCreateForm={openCreateForm}
           createForm={handleCreateFormVisibility}
+          getAllActiveCategoryData={getAllActiveCategoryData}
+          allActiveCategoriesList={allActiveCategoriesList}
           getAllSubCategoryData={getAllSubCategoryData}
           subCategoryDetails={subCategoryDetails}
           updateId={updateId}

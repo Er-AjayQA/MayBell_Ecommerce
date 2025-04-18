@@ -36,7 +36,7 @@ exports.create = async (req, res) => {
     if (alreadyExist) {
       return res.status(201).json({
         success: false,
-        message: "Duplicate name or order no.!!",
+        message: "Duplicate name, parent category or order no.!!",
         data: [],
       });
     }
@@ -86,9 +86,9 @@ exports.getAll = async (req, res) => {
     }
 
     // Calculate total number of records
-    const totalRecords = await CategoryModel.countDocuments(filter);
+    const totalRecords = await SubCategoryModel.countDocuments(filter);
 
-    const getAllData = await CategoryModel.find(filter)
+    const getAllData = await SubCategoryModel.find(filter)
       .limit(limit)
       .skip(skip)
       .sort({
@@ -122,7 +122,7 @@ exports.getDetails = async (req, res) => {
 
     const filter = { deletedAt: null };
 
-    const getDetails = await CategoryModel.findOne({ ...filter, _id: id });
+    const getDetails = await SubCategoryModel.findOne({ ...filter, _id: id });
 
     const success = !getDetails ? false : true;
     const responseStatus = !getDetails ? 404 : 200;
@@ -149,14 +149,14 @@ exports.update = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { name, order } = req.body;
+    const { name, order, category_id } = req.body;
 
     console.log(req.file);
 
-    const ifAlreadyExist = await CategoryModel.find({
+    const ifAlreadyExist = await SubCategoryModel.find({
       _id: { $ne: id },
       deletedAt: null,
-      $or: [{ name }, { order }],
+      $or: [{ $and: [{ name }, { category_id }] }, { order }],
     });
 
     if (ifAlreadyExist.length > 0) {
@@ -173,10 +173,14 @@ exports.update = async (req, res) => {
     if (name) data.name = name;
     if (order) data.order = order;
 
-    const updateData = await CategoryModel.updateOne(
+    const updateData = await SubCategoryModel.updateOne(
       { _id: id },
       {
-        $set: { ...data, slug, category_img: req?.file ? req?.file?.path : {} },
+        $set: {
+          ...data,
+          slug,
+          subCategory_img: req?.file ? req?.file?.path : {},
+        },
       }
     );
 
@@ -222,7 +226,7 @@ exports.delete = async (req, res) => {
   try {
     const { id } = req.body;
 
-    const deleteData = await CategoryModel.updateOne(
+    const deleteData = await SubCategoryModel.updateOne(
       {
         _id: id,
       },
@@ -242,6 +246,7 @@ exports.delete = async (req, res) => {
     });
   }
 };
+
 // Delete Multiple Colors By Ids
 exports.deleteMultiple = async (req, res) => {
   try {
@@ -255,7 +260,7 @@ exports.deleteMultiple = async (req, res) => {
       });
     }
 
-    const deleteData = await CategoryModel.updateMany(
+    const deleteData = await SubCategoryModel.updateMany(
       {
         _id: {
           $in: ids,

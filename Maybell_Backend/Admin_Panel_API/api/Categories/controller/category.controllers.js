@@ -7,7 +7,7 @@ const { generateSlug } = require("../../../helpers/utility");
 // Create New Data
 exports.create = async (req, res) => {
   try {
-    const { name, order } = req.body;
+    const { name, order, category_id } = req.body;
 
     let lastOrderValue = 1;
 
@@ -61,18 +61,22 @@ exports.create = async (req, res) => {
   }
 };
 
-// Get All Colors
+// Get All Categories
 exports.getAll = async (req, res) => {
   try {
     let limit = parseInt(req?.body?.limit) || 15;
     let page = parseInt(req?.body?.page) || 1;
     if (limit < 1) limit = 15;
     if (page < 1) page = 1;
-    const { name, sort } = req.body;
+    const { name, sort, status } = req.body;
 
     let skip = (page - 1) * limit;
 
     const filter = { deletedAt: null };
+
+    if (status !== undefined) {
+      filter.status = status;
+    }
 
     if (name != "" && name != undefined) {
       var nameRegex = new RegExp(name, "i");

@@ -6,12 +6,12 @@ import { Spinner } from "flowbite-react";
 import $ from "jquery";
 import "dropify/dist/css/dropify.min.css";
 import "dropify/dist/js/dropify.min.js";
-import { useEffect, useRef, useState } from "react";
-import {
-  createCategoryService,
-  updateCategoryService,
-} from "../../../Services/CategoryServices";
+import { useEffect, useState } from "react";
 import { toFormData } from "axios";
+import {
+  createSubCategoryService,
+  updateSubCategoryService,
+} from "../../../Services/SubCategoryServices";
 
 export const AddSubCategory = ({
   openCreateForm,
@@ -24,6 +24,7 @@ export const AddSubCategory = ({
   setUpdateId,
   currentImage,
   setCurrentImage,
+  allActiveCategoriesList,
 }) => {
   const [imageValue, setImageValue] = useState("");
 
@@ -76,10 +77,10 @@ export const AddSubCategory = ({
 
       if (updateIdState) {
         console.log("Update Scenario ======", data);
-        response = await updateCategoryService(updateId, toFormData(data));
+        response = await updateSubCategoryService(updateId, toFormData(data));
       } else {
         console.log("New Record Scenario ======", data);
-        response = await createCategoryService(toFormData(data));
+        response = await createSubCategoryService(toFormData(data));
       }
 
       if (response.success) {
@@ -153,6 +154,44 @@ export const AddSubCategory = ({
             >
               <div className="mb-5">
                 <label
+                  htmlFor="category_id"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Parent Category
+                </label>
+                <select
+                  type="text"
+                  id="category_id"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  placeholder="parent category name"
+                  {...register("category_id", {
+                    required: "Parent Category name is required",
+                  })}
+                >
+                  <option disabled>--- Select ---</option>
+                  {allActiveCategoriesList.length > 0 ? (
+                    allActiveCategoriesList.map((activeCategory) => {
+                      return (
+                        <>
+                          <option
+                            key={activeCategory._id}
+                            value={activeCategory._id}
+                          >
+                            {activeCategory.name}
+                          </option>
+                        </>
+                      );
+                    })
+                  ) : (
+                    <option disabled>No records found</option>
+                  )}
+                </select>
+                {errors.name && (
+                  <p className="text-red-500">{errors.name.message}</p>
+                )}
+              </div>
+              <div className="mb-5">
+                <label
                   htmlFor="name"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
@@ -172,16 +211,12 @@ export const AddSubCategory = ({
                 )}
               </div>
               <div className="mb-5">
-                <label
-                  htmlFor="categoryImage"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   SubCategory Banner Image
                 </label>
                 <input
                   type="file"
                   accept="image/*"
-                  // {...register("image", { required: "Category image is required" })}
                   id="categoryImage"
                   name="categoryImage"
                   data-default-file={currentImage}
