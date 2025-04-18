@@ -1,6 +1,6 @@
 import { IoMdSearch } from "react-icons/io";
 
-export const CategoryFilterForm = ({
+export const SubCategoryFilterForm = ({
   filterFormStatus,
   filterData,
   filterFormData,

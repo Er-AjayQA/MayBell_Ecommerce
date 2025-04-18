@@ -24,6 +24,7 @@ import { CmsPages } from "./Components/Pages/CmsPages";
 import { BodyLayout } from "./Components/Layouts/BodyLayout";
 import { Colors } from "./Components/Pages/Colors";
 import { Category } from "./Components/Pages/Category";
+import { SubCategory } from "./Components/Pages/SubCategory";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -55,21 +56,41 @@ createRoot(document.getElementById("root")).render(
               path="/furniture/admin-panel/coupons"
               element={<Coupons />}
             />
+
+            {/* Category Route Start */}
             <Route path="/furniture/admin-panel/">
               <Route path="categories" element={<Category />} />
               <Route path="categories/create" element={<Category />} />
               <Route path="categories/update/:id" element={<Category />} />
             </Route>
+            {/* Category Route End */}
+
+            {/* SubCategory Route Start */}
+            <Route path="/furniture/admin-panel/">
+              <Route path="sub-categories" element={<SubCategory />} />
+              <Route path="sub-categories/create" element={<SubCategory />} />
+              <Route
+                path="sub-categories/update/:id"
+                element={<SubCategory />}
+              />
+            </Route>
+            {/* SubCategory Route End */}
+
+            {/* Colors Route Start */}
             <Route path="/furniture/admin-panel/">
               <Route path="colors" element={<Colors />} />
               <Route path="colors/create" element={<Colors />} />
               <Route path="colors/update/:id" element={<Colors />} />
             </Route>
+            {/* Colors Route End */}
+
+            {/* Materials Route Start */}
             <Route path="/furniture/admin-panel/">
               <Route path="materials" element={<Materials />} />
               <Route path="materials/create" element={<Materials />} />
               <Route path="materials/update/:id" element={<Materials />} />
             </Route>
+            {/* Materials Route End */}
 
             <Route
               path="/furniture/admin-panel/products"

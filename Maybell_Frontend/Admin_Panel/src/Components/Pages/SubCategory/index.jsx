@@ -3,21 +3,19 @@ import { FaPlus, FaFilter } from "react-icons/fa";
 import { MdFilterAltOff } from "react-icons/md";
 import { BreadCrumb } from "../../UI/Breadcrumb";
 import { Link } from "react-router-dom";
-import {
-  getAllCategoryService,
-  getCategoryDetailById,
-} from "../../../Services/CategoryServices";
-import { AddCategory } from "../../UI/Category/AddCategory";
-import { CategoryTableListing } from "../../UI/Category/CategoryListing";
-import { CategoryFilterForm } from "../../UI/Category/CategoryFilterForm";
+import { getAllCategoryService } from "../../../Services/CategoryServices";
+import { SubCategoryFilterForm } from "../../UI/SubCategory/SubCategoryFilterForm";
+import { SubCategoryTableListing } from "../../UI/SubCategory/SubCategoryListing";
+import { AddSubCategory } from "../../UI/SubCategory/AddSubCategory";
+import { getSubCategoryDetailById } from "../../../Services/SubCategoryServices";
 
-export const Category = () => {
+export const SubCategory = () => {
   const [openCreateForm, setOpenCreateForm] = useState(false);
   const [filterFormStatus, setFilterFormStatus] = useState(false);
   const [filterData, setFilterData] = useState({ name: "", code: "" });
-  const [allCategories, setAllCategories] = useState([]);
+  const [allSubCategories, setAllSubCategories] = useState([]);
   const [updateId, setUpdateId] = useState(null);
-  const [categoryDetails, setCategoryDetails] = useState([]);
+  const [subCategoryDetails, setSubCategoryDetails] = useState([]);
   const [updateIdState, setUpdateIdState] = useState(false);
   const [totalRecords, setTotalRecords] = useState(null);
   const [currentLimit, setCurrentLimit] = useState(10);
@@ -29,7 +27,7 @@ export const Category = () => {
   // Handle On Page Change
   const onPageChange = (page) => {
     setCurrentPage(page);
-    getAllCategoryData();
+    getAllSubCategoryData();
   };
 
   // Handle Create Form Visibility
@@ -37,7 +35,7 @@ export const Category = () => {
     if (type === "create") {
       setUpdateId(null);
       setUpdateIdState(false);
-      setCategoryDetails([]);
+      setSubCategoryDetails([]);
     }
     setOpenCreateForm(!openCreateForm);
   };
@@ -59,7 +57,7 @@ export const Category = () => {
   };
 
   // Get All Existing Materials
-  const getAllCategoryData = async () => {
+  const getAllSubCategoryData = async () => {
     const response = await getAllCategoryService({
       ...filterData,
       limit: currentLimit,
@@ -70,7 +68,7 @@ export const Category = () => {
     if (response.success) {
       setTotalPages(response.totalPages);
       setTotalRecords(response.totalRecords);
-      setAllCategories(response.data);
+      setAllSubCategories(response.data);
     }
   };
 
@@ -91,17 +89,17 @@ export const Category = () => {
     setCurrentLimit(event.target.value);
   };
 
-  // Get Material Detail
-  const getCategoryById = async () => {
-    const response = await getCategoryDetailById(updateId);
+  // Get SubCategory Detail
+  const getSubCategoryById = async () => {
+    const response = await getSubCategoryDetailById(updateId);
     if (response.success) {
-      setCategoryDetails(response.data);
+      setSubCategoryDetails(response.data);
       setCurrentImage(response.data.category_img);
     }
   };
 
   useEffect(() => {
-    getAllCategoryData();
+    getAllSubCategoryData();
   }, [filterData, currentLimit, currentPage, sort]);
 
   useEffect(() => {
@@ -109,7 +107,7 @@ export const Category = () => {
       setUpdateIdState(false);
     } else {
       setUpdateIdState(true);
-      getCategoryById();
+      getSubCategoryById();
     }
   }, [updateId]);
 
@@ -139,7 +137,7 @@ export const Category = () => {
                 )}
               </button>
               <Link
-                to={"/furniture/admin-panel/categories/create"}
+                to={"/furniture/admin-panel/sub-categories/create"}
                 className="w-[2.5rem] h-[2.5rem] p-1 rounded-[50%] bg-[#3e8ef7] flex items-center justify-center shadow-lg transition-all duration-1000 ease-in-out hover:shadow-sm hover:bg-[#589FFC]"
                 onClick={() => {
                   handleCreateFormVisibility("create");
@@ -154,7 +152,7 @@ export const Category = () => {
         {/* Body Header End */}
 
         {/* Filter Section Start */}
-        <CategoryFilterForm
+        <SubCategoryFilterForm
           filterFormStatus={filterFormStatus}
           filterData={filterData}
           filterFormData={handleFilterData}
@@ -163,10 +161,10 @@ export const Category = () => {
         {/* Filter Section End */}
 
         {/* Table Section Start */}
-        <CategoryTableListing
-          allCategories={allCategories}
+        <SubCategoryTableListing
+          allSubCategories={allSubCategories}
           filterData={filterData}
-          getAllCategoryData={getAllCategoryData}
+          getAllSubCategoryData={getAllSubCategoryData}
           filterFormData={handleFilterData}
           handleUpdateId={handleUpdateId}
           handleSelection={handleSelection}
@@ -180,11 +178,11 @@ export const Category = () => {
         {/* Table Section End */}
 
         {/* Create Form Start */}
-        <AddCategory
+        <AddSubCategory
           openCreateForm={openCreateForm}
           createForm={handleCreateFormVisibility}
-          getAllCategoryData={getAllCategoryData}
-          categoryDetails={categoryDetails}
+          getAllSubCategoryData={getAllSubCategoryData}
+          subCategoryDetails={subCategoryDetails}
           updateId={updateId}
           updateIdState={updateIdState}
           setUpdateId={setUpdateId}

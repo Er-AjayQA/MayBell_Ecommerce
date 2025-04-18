@@ -22,9 +22,9 @@ import {
   deleteMultipleCategoryService,
 } from "../../../Services/CategoryServices";
 
-export const CategoryTableListing = ({
-  allCategories,
-  getAllCategoryData,
+export const SubCategoryTableListing = ({
+  allSubCategories,
+  getAllSubCategoryData,
   filterData,
   filterFormData,
   handleUpdateId,
@@ -41,7 +41,7 @@ export const CategoryTableListing = ({
 
   // Handle Download CSV
   const handleDownloadCSV = () => {
-    const dataToExport = allCategories.map((category) => ({
+    const dataToExport = allSubCategories.map((category) => ({
       Name: category.name,
       "Banner Image": category.category_img || "N/A",
       Order: category.order || "N/A",
@@ -70,7 +70,7 @@ export const CategoryTableListing = ({
 
       // Prepare data for the table
       const headers = [["Name", "Category Image", "Order", "Status"]];
-      const tableData = allCategories.map((category) => [
+      const tableData = allSubCategories.map((category) => [
         category.name,
         category.category_img ? category.category_img : "No",
         category.order || "N/A",
@@ -141,7 +141,7 @@ export const CategoryTableListing = ({
   // Handle Select All Checkboxes
   const handleSelectAllCheckboxes = (event) => {
     if (event.target.checked) {
-      const data = allCategories.map((category) => {
+      const data = allSubCategories.map((category) => {
         return category._id;
       });
       setSelectedRecords(data);
@@ -156,7 +156,7 @@ export const CategoryTableListing = ({
 
     if (response.success) {
       toast.success(response.message);
-      getAllCategoryData();
+      getAllSubCategoryData();
     }
   };
 
@@ -166,7 +166,7 @@ export const CategoryTableListing = ({
 
     if (response.success) {
       toast.success(response.message);
-      getAllCategoryData();
+      getAllSubCategoryData();
     }
   };
 
@@ -178,7 +178,7 @@ export const CategoryTableListing = ({
 
     if (response.success) {
       toast.success(response.message);
-      getAllCategoryData();
+      getAllSubCategoryData();
     } else {
       toast.error(response.message);
     }
@@ -285,23 +285,24 @@ export const CategoryTableListing = ({
                   defaultChecked="false"
                   onChange={handleSelectAllCheckboxes}
                   checked={
-                    allCategories.length >= 1 &&
-                    selectedRecords.length === allCategories.length
+                    allSubCategories.length >= 1 &&
+                    selectedRecords.length === allSubCategories.length
                       ? "checked"
                       : ""
                   }
                 />
               </Table.HeadCell>
               <Table.HeadCell>Name</Table.HeadCell>
-              <Table.HeadCell>Banner Image</Table.HeadCell>
+              <Table.HeadCell>Category Id</Table.HeadCell>
+              <Table.HeadCell>SubCategory Image</Table.HeadCell>
               <Table.HeadCell>Order</Table.HeadCell>
               <Table.HeadCell>Status</Table.HeadCell>
               <Table.HeadCell>Action</Table.HeadCell>
             </Table.Head>
 
             <Table.Body className="divide-y ">
-              {allCategories?.length >= 1 ? (
-                allCategories.map((category) => {
+              {allSubCategories?.length >= 1 ? (
+                allSubCategories.map((category) => {
                   return (
                     <Table.Row
                       className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center"
@@ -322,6 +323,9 @@ export const CategoryTableListing = ({
                         {category?.name}
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                        {category?.category_id}
+                      </Table.Cell>
+                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                         {category?.category_img ? (
                           <>
                             <img
@@ -332,7 +336,9 @@ export const CategoryTableListing = ({
                               }}
                             />
                             <Modal show={openModal} onClose={handleCloseModal}>
-                              <ModalHeader>Category Banner Image</ModalHeader>
+                              <ModalHeader>
+                                SubCategory Banner Image
+                              </ModalHeader>
                               <ModalBody>
                                 <div className="space-y-6">
                                   <img
@@ -396,7 +402,7 @@ export const CategoryTableListing = ({
                 })
               ) : (
                 <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                  <Table.Cell className="p-4" colSpan="5">
+                  <Table.Cell className="p-4" colSpan="7">
                     <p className="text-center">No records found!</p>
                   </Table.Cell>
                 </Table.Row>

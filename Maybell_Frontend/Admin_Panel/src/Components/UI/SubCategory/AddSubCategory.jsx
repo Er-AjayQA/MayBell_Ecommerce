@@ -13,12 +13,12 @@ import {
 } from "../../../Services/CategoryServices";
 import { toFormData } from "axios";
 
-export const AddCategory = ({
+export const AddSubCategory = ({
   openCreateForm,
   createForm,
-  getAllCategoryData,
+  getAllSubCategoryData,
   updateId,
-  categoryDetails,
+  subCategoryDetails,
   updateIdState,
   setUpdateIdState,
   setUpdateId,
@@ -86,7 +86,7 @@ export const AddCategory = ({
         toast.success(response.message);
         reset();
         createForm();
-        getAllCategoryData();
+        getAllSubCategoryData();
         if (updateIdState) {
           setUpdateIdState(false);
           setUpdateId(null);
@@ -109,9 +109,9 @@ export const AddCategory = ({
   };
 
   useEffect(() => {
-    if (updateIdState && categoryDetails) {
-      setValue("name", categoryDetails.name);
-      setValue("order", categoryDetails.order);
+    if (updateIdState && subCategoryDetails) {
+      setValue("name", subCategoryDetails.name);
+      setValue("order", subCategoryDetails.order);
     } else {
       reset({
         name: "",
@@ -119,7 +119,7 @@ export const AddCategory = ({
       });
       setCurrentImage(null);
     }
-  }, [updateIdState, categoryDetails, setValue, reset]);
+  }, [updateIdState, subCategoryDetails, setValue, reset]);
 
   return (
     <>
@@ -132,9 +132,9 @@ export const AddCategory = ({
         <div className="absolute top-[20%] start-[50%] translate-x-[-50%] translate-y-[-20%] rounded-md bg-white z-[999] p-5 min-w-[500px]">
           <div className="mb-3 flex items-center justify-between">
             <h1 className="py-3 font-bold">
-              {updateIdState ? "Update Category" : "Create Category"}
+              {updateIdState ? "Update SubCategory" : "Create SubCategory"}
             </h1>
-            <Link to={"/furniture/admin-panel/categories"}>
+            <Link to={"/furniture/admin-panel/sub-categories"}>
               <IoClose
                 className="cursor-pointer"
                 onClick={() => {
@@ -153,10 +153,30 @@ export const AddCategory = ({
             >
               <div className="mb-5">
                 <label
+                  htmlFor="name"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  SubCategory Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  placeholder="subcategory name"
+                  {...register("name", {
+                    required: "SubCategory name is required",
+                  })}
+                />
+                {errors.name && (
+                  <p className="text-red-500">{errors.name.message}</p>
+                )}
+              </div>
+              <div className="mb-5">
+                <label
                   htmlFor="categoryImage"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  Category Banner Image
+                  SubCategory Banner Image
                 </label>
                 <input
                   type="file"
@@ -168,26 +188,6 @@ export const AddCategory = ({
                   className="dropify"
                   data-height="250"
                 />
-              </div>
-              <div className="mb-5">
-                <label
-                  htmlFor="name"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Category Name
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="category name"
-                  {...register("name", {
-                    required: "Category name is required",
-                  })}
-                />
-                {errors.name && (
-                  <p className="text-red-500">{errors.name.message}</p>
-                )}
               </div>
               <div className="mb-5">
                 <label
@@ -206,7 +206,7 @@ export const AddCategory = ({
               </div>
               <div className="flex justify-end gap-2">
                 <Link
-                  to={"/furniture/admin-panel/categories"}
+                  to={"/furniture/admin-panel/sub-categories"}
                   type="submit"
                   className="text-black bg-gray-400 hover:bg-gray-300 focus:ring-none focus:outline-none font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
                   onClick={() => {
