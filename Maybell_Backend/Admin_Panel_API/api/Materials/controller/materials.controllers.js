@@ -59,7 +59,7 @@ exports.getAll = async (req, res) => {
     let page = parseInt(req?.body?.page) || 1;
     if (limit < 1) limit = 15;
     if (page < 1) page = 1;
-    const { name } = req.body;
+    const { name, sort } = req.body;
 
     let skip = (page - 1) * limit;
 
@@ -77,7 +77,7 @@ exports.getAll = async (req, res) => {
       .limit(limit)
       .skip(skip)
       .sort({
-        _id: "desc",
+        _id: sort ? "asc" : "desc",
       });
 
     return res.status(200).json({

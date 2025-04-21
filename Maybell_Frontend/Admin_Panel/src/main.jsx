@@ -13,7 +13,6 @@ import { Sliders } from "./Components/Pages/Sliders";
 import { Testimonials } from "./Components/Pages/Testimonials";
 import { WhyChooseUs } from "./Components/Pages/WhyChooseUs";
 import { Coupons } from "./Components/Pages/Coupons";
-import { Materials } from "./Components/Pages/Materials";
 import { Products } from "./Components/Pages/Products";
 import { Enquiry } from "./Components/Pages/Enquiry";
 import { Newsletters } from "./Components/Pages/Newsletters";
@@ -25,6 +24,9 @@ import { BodyLayout } from "./Components/Layouts/BodyLayout";
 import { Colors } from "./Components/Pages/Colors";
 import { Category } from "./Components/Pages/Category";
 import { SubCategory } from "./Components/Pages/SubCategory";
+import { MaterialTableListing } from "./Components/Pages/Materials/MaterialListing";
+import { MaterialContext } from "./Context/MaterialsContext";
+import { AddMaterials } from "./Components/UI/Materials/AddMaterials";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -85,10 +87,31 @@ createRoot(document.getElementById("root")).render(
             {/* Colors Route End */}
 
             {/* Materials Route Start */}
-            <Route path="/furniture/admin-panel/">
-              <Route path="materials" element={<Materials />} />
-              <Route path="materials/create" element={<Materials />} />
-              <Route path="materials/update/:id" element={<Materials />} />
+            <Route path="/furniture/admin-panel/materials">
+              <Route
+                path="create"
+                element={
+                  <MaterialContext>
+                    <MaterialTableListing />
+                  </MaterialContext>
+                }
+              />
+              <Route
+                path="update/:id"
+                element={
+                  <MaterialContext>
+                    <MaterialTableListing />
+                  </MaterialContext>
+                }
+              />
+              <Route
+                path="listing"
+                element={
+                  <MaterialContext>
+                    <MaterialTableListing />
+                  </MaterialContext>
+                }
+              />
             </Route>
             {/* Materials Route End */}
 

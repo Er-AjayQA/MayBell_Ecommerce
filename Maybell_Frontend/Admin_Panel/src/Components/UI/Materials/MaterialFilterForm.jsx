@@ -1,11 +1,18 @@
+import { useContext } from "react";
 import { IoMdSearch } from "react-icons/io";
+import MaterialContextData from "../../../Context/MaterialsContext";
 
-export const MaterialFilterForm = ({
-  filterFormStatus,
-  filterData,
-  filterFormData,
-  filterFormReset,
-}) => {
+export const MaterialFilterForm = ({ filterFormData, filterFormReset }) => {
+  const {
+    filterFormStatus,
+    filterData,
+    handleFilterData,
+    allMaterials,
+    setFilterData,
+    handleClearFilterForm,
+    handleFilterFormVisibility,
+  } = useContext(MaterialContextData);
+
   return (
     <>
       {/* Filter Section Start */}
@@ -28,14 +35,14 @@ export const MaterialFilterForm = ({
             placeholder="Name"
             value={filterData.name}
             className="py-1 px-3 rounded-lg basis-[30%]"
-            onChange={(event) => filterFormData(event)}
+            onChange={(event) => handleFilterData(event)}
           />
           <button className="flex items-center justify-center gap-2 py-1 px-4 bg-[#3e8ef7] text-white rounded-lg hover:bg-[#589FFC] transition-all duration-500 ease-in-out">
             <IoMdSearch className="text-[16px]" /> Filter Materials
           </button>
           <button
             className="py-1 px-4 bg-[#3e8ef7] text-white rounded-lg hover:bg-[#589FFC] transition-all duration-500 ease-in-out"
-            onClick={() => filterFormReset()}
+            onClick={() => handleClearFilterForm()}
           >
             Clear
           </button>
