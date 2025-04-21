@@ -4,16 +4,20 @@ import {
   getMaterialsDetailById,
 } from "../Services/MaterialServices";
 import { useNavigate } from "react-router-dom";
+import {
+  getAllColorsService,
+  getColorsDetailById,
+} from "../Services/ColorServices";
 
-const MaterialContextData = createContext();
+const ColorsContextData = createContext();
 
-export const MaterialContext = ({ children }) => {
+export const ColorsContext = ({ children }) => {
   const [openModal, setOpenModal] = useState(false);
   const [filterFormStatus, setFilterFormStatus] = useState(false);
   const [filterData, setFilterData] = useState({ name: "" });
-  const [allMaterials, setAllMaterials] = useState([]);
+  const [allColors, setAllColors] = useState([]);
   const [updateId, setUpdateId] = useState(null);
-  const [materialDetails, setMaterialDetails] = useState([]);
+  const [colorDetails, setColorDetails] = useState([]);
   const [updateIdState, setUpdateIdState] = useState(false);
   const [totalRecords, setTotalRecords] = useState(null);
   const [currentLimit, setCurrentLimit] = useState(10);
@@ -46,7 +50,7 @@ export const MaterialContext = ({ children }) => {
     if (type === "create") {
       setUpdateId(null);
       setUpdateIdState(false);
-      setMaterialDetails([]);
+      setColorDetails([]);
     }
   };
 
@@ -55,12 +59,12 @@ export const MaterialContext = ({ children }) => {
     setOpenModal(false);
     setUpdateId(null);
     setUpdateIdState(false);
-    navigate("/furniture/admin-panel/materials");
+    navigate("/furniture/admin-panel/colors");
   };
 
   // Get All Existing Materials
-  const getAllMaterialsData = async () => {
-    const response = await getAllMaterialsService({
+  const getAllColorsData = async () => {
+    const response = await getAllColorsService({
       ...filterData,
       limit: currentLimit,
       page: currentPage,
@@ -70,14 +74,14 @@ export const MaterialContext = ({ children }) => {
     if (response.success) {
       setTotalPages(response.totalPages);
       setTotalRecords(response.totalRecords);
-      setAllMaterials(response.data);
+      setAllColors(response.data);
     }
   };
 
   // Handle On Page Change
   const onPageChange = (page) => {
     setCurrentPage(page);
-    getAllMaterialsData();
+    getAllColorsData();
   };
 
   // Handle Set Update Id
@@ -98,10 +102,10 @@ export const MaterialContext = ({ children }) => {
   };
 
   // Get Material Detail
-  const getMaterialById = async () => {
-    const response = await getMaterialsDetailById(updateId);
+  const getColorById = async () => {
+    const response = await getColorsDetailById(updateId);
     if (response.success) {
-      setMaterialDetails(response.data);
+      setColorDetails(response.data);
     }
   };
 
@@ -111,7 +115,7 @@ export const MaterialContext = ({ children }) => {
   };
 
   useEffect(() => {
-    getAllMaterialsData(currentLimit);
+    getAllColorsData(currentLimit);
   }, [filterData, currentLimit, currentPage, sort]);
 
   useEffect(() => {
@@ -119,19 +123,19 @@ export const MaterialContext = ({ children }) => {
       setUpdateIdState(false);
     } else {
       setUpdateIdState(true);
-      getMaterialById();
+      getColorById();
     }
   }, [updateId]);
 
   const data = {
-    allMaterials,
+    allColors,
     filterFormStatus,
     filterData,
     totalRecords,
     totalPages,
     openModal,
     updateIdState,
-    materialDetails,
+    colorDetails,
     updateId,
     currentPage,
     handleOpenModal,
@@ -146,16 +150,16 @@ export const MaterialContext = ({ children }) => {
     onPageChange,
     handleUpdateId,
     handleSelection,
-    getAllMaterialsData,
+    getAllColorsData,
   };
 
   return (
     <>
-      <MaterialContextData.Provider value={data}>
+      <ColorsContextData.Provider value={data}>
         {children}
-      </MaterialContextData.Provider>
+      </ColorsContextData.Provider>
     </>
   );
 };
 
-export default MaterialContextData;
+export default ColorsContextData;

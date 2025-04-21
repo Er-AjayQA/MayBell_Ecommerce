@@ -21,12 +21,12 @@ import { Configurations } from "./Components/Pages/Configurations";
 import { Faq } from "./Components/Pages/Faq";
 import { CmsPages } from "./Components/Pages/CmsPages";
 import { BodyLayout } from "./Components/Layouts/BodyLayout";
-import { Colors } from "./Components/Pages/Colors";
 import { Category } from "./Components/Pages/Category";
 import { SubCategory } from "./Components/Pages/SubCategory";
 import { MaterialTableListing } from "./Components/Pages/Materials/MaterialListing";
 import { MaterialContext } from "./Context/MaterialsContext";
-import { AddMaterials } from "./Components/UI/Materials/AddMaterials";
+import { ColorsTableListing } from "./Components/Pages/Colors/ColorsListing";
+import { ColorsContext } from "./Context/ColorsContext";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -79,10 +79,31 @@ createRoot(document.getElementById("root")).render(
             {/* SubCategory Route End */}
 
             {/* Colors Route Start */}
-            <Route path="/furniture/admin-panel/">
-              <Route path="colors" element={<Colors />} />
-              <Route path="colors/create" element={<Colors />} />
-              <Route path="colors/update/:id" element={<Colors />} />
+            <Route path="/furniture/admin-panel/colors">
+              <Route
+                path="create"
+                element={
+                  <ColorsContext>
+                    <ColorsTableListing />
+                  </ColorsContext>
+                }
+              />
+              <Route
+                path="update/:id"
+                element={
+                  <ColorsContext>
+                    <ColorsTableListing />
+                  </ColorsContext>
+                }
+              />
+              <Route
+                path=""
+                element={
+                  <ColorsContext>
+                    <ColorsTableListing />
+                  </ColorsContext>
+                }
+              />
             </Route>
             {/* Colors Route End */}
 
@@ -105,7 +126,7 @@ createRoot(document.getElementById("root")).render(
                 }
               />
               <Route
-                path="listing"
+                path=""
                 element={
                   <MaterialContext>
                     <MaterialTableListing />

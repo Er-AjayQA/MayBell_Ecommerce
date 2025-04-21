@@ -124,7 +124,7 @@ export const AddMaterials = () => {
                 </div>
                 <div className="flex justify-end gap-2">
                   <Link
-                    to={"/furniture/admin-panel/materials/listing"}
+                    to={"/furniture/admin-panel/materials"}
                     type="submit"
                     className="text-black bg-gray-400 hover:bg-gray-300 focus:ring-none focus:outline-none font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
                     onClick={onCloseModal}
