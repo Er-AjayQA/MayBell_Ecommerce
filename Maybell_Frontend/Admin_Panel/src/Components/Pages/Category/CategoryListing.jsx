@@ -28,6 +28,11 @@ import { CategoryFilterForm } from "../../UI/Category/CategoryFilterForm";
 import { AddCategory } from "../../UI/Category/AddCategory";
 import CategoryContextData from "../../../Context/CategoryContext";
 import { BreadCrumbActionButtons } from "../../UI/Category/ActionButtons";
+import {
+  changeCategoryStatusService,
+  deleteCategoryService,
+  deleteMultipleCategoryService,
+} from "../../../Services/CategoryServices";
 
 export const CategoryTableListing = () => {
   const {
@@ -42,7 +47,7 @@ export const CategoryTableListing = () => {
     onPageChange,
     handleUpdateId,
     handleSelection,
-    getAllColorsData,
+    getAllCategoriesData,
     handleSortData,
     handleCloseImageModal,
     handleOpenImageModal,
@@ -77,33 +82,33 @@ export const CategoryTableListing = () => {
 
   // Change Status of Materials
   const handleStatusChange = async (id) => {
-    const response = await changeColorsStatusService({ id });
+    const response = await changeCategoryStatusService({ id });
 
     if (response.success) {
       toast.success(response.message);
-      getAllColorsData();
+      getAllCategoriesData();
     }
   };
 
   // Handle Delete Materials
-  const handleDeleteColors = async (id) => {
-    const response = await deleteColorService({ id });
+  const handleDeleteCategory = async (id) => {
+    const response = await deleteCategoryService({ id });
 
     if (response.success) {
       toast.success(response.message);
-      getAllColorsData();
+      getAllCategoriesData();
     }
   };
 
   // Handle Delete Multiple Data
-  const handleDeleteMultipleColors = async () => {
-    const response = await deleteMultipleColorsService({
+  const handleDeleteMultipleCategories = async () => {
+    const response = await deleteMultipleCategoryService({
       ids: selectedRecords,
     });
 
     if (response.success) {
       toast.success(response.message);
-      getAllColorsData();
+      getAllCategoriesData();
     } else {
       toast.error(response.message);
     }
@@ -189,7 +194,7 @@ export const CategoryTableListing = () => {
                 <Tooltip content="Delete Selected" placement="top">
                   <button
                     className="p-2 text-red-500 hover:bg-gray-100 rounded-lg border border-gray-200"
-                    onClick={handleDeleteMultipleColors}
+                    onClick={handleDeleteMultipleCategories}
                   >
                     <RiDeleteBin5Fill />
                   </button>
@@ -314,7 +319,7 @@ export const CategoryTableListing = () => {
                         <Table.Cell>
                           <div className="flex justify-center items-center gap-2">
                             <Link
-                              to={`/furniture/admin-panel/colors/update/${category?._id}`}
+                              to={`/furniture/admin-panel/category/update/${category?._id}`}
                               className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-green-400 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out"
                               onClick={() =>
                                 handleUpdateId(category?._id, "update")
@@ -324,7 +329,9 @@ export const CategoryTableListing = () => {
                             </Link>
                             <button
                               className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-red-600 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out"
-                              onClick={() => handleDeleteColors(category?._id)}
+                              onClick={() =>
+                                handleDeleteCategory(category?._id)
+                              }
                             >
                               <MdDeleteForever />
                             </button>
@@ -335,7 +342,7 @@ export const CategoryTableListing = () => {
                   })
                 ) : (
                   <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                    <Table.Cell className="p-4" colSpan="5">
+                    <Table.Cell className="p-4" colSpan="6">
                       <p className="text-center">No records found!</p>
                     </Table.Cell>
                   </Table.Row>

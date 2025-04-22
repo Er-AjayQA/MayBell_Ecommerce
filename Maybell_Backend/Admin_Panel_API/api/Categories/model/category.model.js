@@ -9,9 +9,10 @@ const CategorySchema = new mongoose.Schema({
   },
   slug: {
     type: String,
+    default: "",
   },
-  category_img: { type: String },
-  order: { type: Number, min: 0, max: 10000, default: 0 },
+  image: { type: String, default: "" },
+  order: { type: Number, min: 1, max: 10000, default: 1 },
   status: {
     type: Boolean,
     default: true,

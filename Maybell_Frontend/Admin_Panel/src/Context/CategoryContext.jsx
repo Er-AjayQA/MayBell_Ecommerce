@@ -68,7 +68,7 @@ export const CategoryContext = ({ children }) => {
     setOpenModal(false);
     setUpdateId(null);
     setUpdateIdState(false);
-    navigate("/furniture/admin-panel/colors");
+    navigate("/furniture/admin-panel/category");
   };
 
   // Get All Existing Categories

@@ -7,7 +7,7 @@ const { generateSlug } = require("../../../helpers/utility");
 // Create New Data
 exports.create = async (req, res) => {
   try {
-    const { name, order, category_id } = req.body;
+    const { name, order } = req.body;
 
     let lastOrderValue = 1;
 
@@ -37,12 +37,16 @@ exports.create = async (req, res) => {
     }
 
     let slug = generateSlug(name);
+
     const data = {
       name,
       order: order ? order : lastOrderValue,
-      category_img: req?.file?.path,
       slug,
     };
+
+    if (req.file) {
+      data.image = req.file.fileName;
+    }
 
     const createData = await CategoryModel.create(data);
     await createData.save();

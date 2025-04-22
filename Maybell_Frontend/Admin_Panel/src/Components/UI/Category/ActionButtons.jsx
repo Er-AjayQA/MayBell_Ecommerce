@@ -26,7 +26,7 @@ export const BreadCrumbActionButtons = () => {
             )}
           </button>
           <Link
-            to={"/furniture/admin-panel/colors/create"}
+            to={"/furniture/admin-panel/category/create"}
             className="w-[2.5rem] h-[2.5rem] p-1 rounded-[50%] bg-[#3e8ef7] flex items-center justify-center shadow-lg transition-all duration-1000 ease-in-out hover:shadow-sm hover:bg-[#589FFC]"
             onClick={() => handleOpenModal("create")}
           >

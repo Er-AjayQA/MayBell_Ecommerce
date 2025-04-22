@@ -1,14 +1,16 @@
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { Modal, ModalBody, ModalHeader } from "flowbite-react";
-import { ChromePicker } from "react-color";
+import { Modal, ModalBody, ModalHeader, Spinner } from "flowbite-react";
 import { Link } from "react-router-dom";
-import { useContext, useEffect, useState } from "react";
-import {
-  createColorsService,
-  updateColorService,
-} from "../../../Services/ColorServices";
+import { useContext, useEffect, useRef, useState } from "react";
+import $ from "jquery";
+import "dropify/dist/css/dropify.min.css";
+import "dropify/dist/js/dropify.min.js";
 import CategoryContextData from "../../../Context/CategoryContext";
+import {
+  createCategoryService,
+  updateCategoryService,
+} from "../../../Services/CategoryServices";
 
 export const AddCategory = () => {
   const {
@@ -18,16 +20,14 @@ export const AddCategory = () => {
     setUpdateIdState,
     onCloseModal,
     updateIdState,
-    getAllColorsData,
-    colorDetails,
+    getAllCategoriesData,
+    categoryDetails,
   } = useContext(CategoryContextData);
 
-  const [color, setColor] = useState("#000000");
-
-  // Handle Color Change
-  const handleColorChange = (newColor) => {
-    setColor(newColor.hex);
-  };
+  const [imagePath, setImagePath] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [imageValue, setImageValue] = useState(null);
+  const fileInputRef = useRef(null);
 
   const {
     register,
@@ -37,52 +37,98 @@ export const AddCategory = () => {
     formState: { errors },
   } = useForm();
 
+  useEffect(() => {
+    const dropifyElement = $("#categoryImage");
+
+    // Destroy existing Dropify instance if it exists
+    if (dropifyElement.data("dropify")) {
+      dropifyElement.dropify("destroy");
+    }
+
+    // Initialize Dropify with proper configuration
+    dropifyElement.dropify({
+      defaultFile: updateIdState ? imagePath : "",
+      messages: {
+        default: "Drag and drop a file or click to browse",
+        replace: "Drag and drop or click to replace",
+        remove: "Remove",
+        error: "Ooops, something wrong happened.",
+      },
+    });
+
+    // Handle file change
+    dropifyElement.on("change", function (event) {
+      if (event.target.files.length > 0) {
+        setImageValue(event.target.files[0]);
+      } else {
+        setImageValue(null);
+      }
+    });
+
+    return () => {
+      dropifyElement.off("change");
+      if (dropifyElement.data("dropify")) {
+        dropifyElement.dropify("destroy");
+      }
+    };
+  }, [imagePath, updateIdState]);
+
   const onSubmit = async (data) => {
-    if (updateIdState) {
-      const response = await updateColorService(updateId, data);
+    try {
+      setIsLoading(true);
+
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("order", data.order || "");
+
+      if (fileInputRef.current?.files[0]) {
+        formData.append("image", fileInputRef.current.files[0]);
+      }
+
+      let response;
+
+      if (updateIdState) {
+        console.log("Update Scenario ======", data);
+        response = await updateCategoryService(updateId, formData);
+      } else {
+        console.log("New Record Scenario ======", data);
+        response = await createCategoryService(formData);
+      }
 
       if (response.success) {
         toast.success(response.message);
         reset();
+        setImageValue(null);
+        setImagePath("");
         onCloseModal();
-        getAllColorsData();
-        setUpdateIdState(false);
-        setUpdateId(null);
+        getAllCategoriesData();
+        if (updateIdState) {
+          setUpdateIdState(false);
+          setUpdateId(null);
+        }
       } else {
         toast.error(response.message);
+        setIsLoading(false);
       }
-    } else {
-      const response = await createColorsService(data);
-
-      if (response.success) {
-        toast.success(response.message);
-        reset();
-        onCloseModal();
-        getAllColorsData();
-      } else {
-        toast.error(response.message);
-      }
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
+    } finally {
+      setIsLoading(false); // Ensure loading is false when done
     }
   };
 
   useEffect(() => {
-    if (updateIdState && colorDetails) {
-      setValue("name", colorDetails.name);
-      setValue("order", colorDetails.order);
-      setColor(colorDetails.colorCode);
+    if (updateIdState && categoryDetails) {
+      setValue("name", categoryDetails.name);
+      setValue("order", categoryDetails.order);
+      setImagePath(categoryDetails.image_path + categoryDetails.image);
     } else {
       reset({
         name: "",
-        code: "",
         order: "",
       });
-      setColor("#000000");
     }
-  }, [updateIdState, colorDetails, openModal, setValue, reset, setColor]);
-
-  useEffect(() => {
-    setValue("code", color);
-  }, [color, setValue]);
+  }, [updateIdState, categoryDetails, openModal, setValue, reset]);
 
   return (
     <>
@@ -102,73 +148,66 @@ export const AddCategory = () => {
                 onSubmit={handleSubmit(onSubmit)}
                 autoComplete="off"
               >
-                <div className="flex gap-5">
-                  <div className="basis-[50%]">
-                    <div className="mb-5">
-                      <label
-                        htmlFor="name"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                      >
-                        Name
-                      </label>
-                      <input
-                        type="text"
-                        id="name"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        placeholder="color name"
-                        {...register("name", {
-                          required: "Color name is required",
-                        })}
-                      />
-                      {errors.name && (
-                        <p className="text-red-500">{errors.name.message}</p>
-                      )}
-                    </div>
-                    <div className="mb-5">
-                      <label
-                        htmlFor="order"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                      >
-                        Order
-                      </label>
-                      <input
-                        type="number"
-                        id="order"
-                        {...register("order")}
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      />
-                    </div>
-                  </div>
-                  <div className="basis-[50%]">
-                    <div className="mb-5">
-                      <label
-                        htmlFor="code"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                      >
-                        Color Code
-                      </label>
-                      <ChromePicker
-                        color={color}
-                        id="code"
-                        onChange={handleColorChange}
-                      />
-                      <input
-                        type="hidden"
-                        id="code"
-                        {...register("code", {
-                          required: "Color Code is required",
-                        })}
-                      />
-                      {errors.code && (
-                        <p className="text-red-500">{errors.code.message}</p>
-                      )}
-                    </div>
-                  </div>
+                <div className="mb-5">
+                  <label
+                    htmlFor="categoryImage"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Category Banner Image
+                  </label>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    accept="image/*"
+                    // {...register("image", { required: "Category image is required" })}
+                    id="categoryImage"
+                    name="image"
+                    data-default-file={imagePath}
+                    className="dropify"
+                    data-height="250"
+                  />
+                  {errors.image && (
+                    <p className="text-red-500">{errors.image.message}</p>
+                  )}
                 </div>
-
-                <div className="flex justify-center gap-2 mt-5">
+                <div className="mb-5">
+                  <label
+                    htmlFor="name"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Category Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="category name"
+                    {...register("name", {
+                      required: "Category name is required",
+                    })}
+                  />
+                  {errors.name && (
+                    <p className="text-red-500">{errors.name.message}</p>
+                  )}
+                </div>
+                <div className="mb-5">
+                  <label
+                    htmlFor="order"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Order
+                  </label>
+                  <input
+                    type="number"
+                    id="order"
+                    {...register("order")}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="1"
+                  />
+                </div>
+                <div className="flex justify-end gap-2">
                   <Link
-                    to={"/furniture/admin-panel/colors"}
+                    to={"/furniture/admin-panel/category"}
                     type="submit"
                     className="text-black bg-gray-400 hover:bg-gray-300 focus:ring-none focus:outline-none font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
                     onClick={onCloseModal}
@@ -177,9 +216,27 @@ export const AddCategory = () => {
                   </Link>
                   <button
                     type="submit"
-                    className="text-white bg-[#3e8ef7] hover:bg-[#589ffc] focus:ring-none focus:outline-none font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
+                    className={`text-white bg-[#3e8ef7] hover:bg-[#589ffc] focus:ring-none focus:outline-none font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center ${
+                      isLoading
+                        ? "cursor-not-allowed bg-[#91b2dd] hover:bg-[#91b2dd]"
+                        : "cursor-pointer"
+                    }`}
+                    disabled={isLoading ? "disabled" : ""}
                   >
-                    {updateIdState ? "Update" : "Create"}
+                    {isLoading ? (
+                      <>
+                        <Spinner
+                          aria-label="Spinner button example"
+                          size="sm"
+                          light
+                        />
+                        <span className="pl-3">Loading...</span>
+                      </>
+                    ) : updateIdState ? (
+                      "Update"
+                    ) : (
+                      "Create"
+                    )}
                   </button>
                 </div>
               </form>
