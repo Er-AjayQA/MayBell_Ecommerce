@@ -263,13 +263,13 @@ export const CategoryTableListing = () => {
                           {category?.name}
                         </Table.Cell>
                         <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                          {category?.category_img ? (
+                          {category?.image ? (
                             <>
                               <img
-                                src={category?.category_img}
+                                src={category?.image}
                                 className="w-[50px] h-[50px] mx-auto cursor-pointer"
                                 onClick={() => {
-                                  handleOpenImageModal(category?.category_img);
+                                  handleOpenImageModal(category?.image);
                                 }}
                               />
                               <Modal
@@ -289,7 +289,7 @@ export const CategoryTableListing = () => {
                                 <ModalFooter>
                                   <Button
                                     color="gray"
-                                    onClick={handleOpenImageModal}
+                                    onClick={handleCloseImageModal}
                                     className="mx-auto"
                                   >
                                     Close

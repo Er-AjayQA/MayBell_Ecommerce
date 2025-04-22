@@ -2,7 +2,11 @@ import axiosInstance from "../../api/axiosInstance";
 
 // Create Category Service
 export const createCategoryService = async (formData) => {
-  const data = await axiosInstance.post("/categories/create", formData);
+  const data = await axiosInstance.post("/categories/create", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return data.data;
 };
 
@@ -20,7 +24,11 @@ export const getCategoryDetailById = async (id) => {
 
 // Update Category Service
 export const updateCategoryService = async (id, formData) => {
-  const data = await axiosInstance.put(`/categories/update/${id}`, formData);
+  const data = await axiosInstance.put(`/categories/update/${id}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return data.data;
 };
 

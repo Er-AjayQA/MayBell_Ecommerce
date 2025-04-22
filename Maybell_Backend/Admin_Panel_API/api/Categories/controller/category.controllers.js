@@ -45,7 +45,7 @@ exports.create = async (req, res) => {
     };
 
     if (req.file) {
-      data.image = req.file.fileName;
+      data.image = req.file.path;
     }
 
     const createData = await CategoryModel.create(data);
@@ -153,8 +153,6 @@ exports.update = async (req, res) => {
 
     const { name, order } = req.body;
 
-    console.log(req.file);
-
     const ifAlreadyExist = await CategoryModel.find({
       _id: { $ne: id },
       deletedAt: null,
@@ -175,10 +173,14 @@ exports.update = async (req, res) => {
     if (name) data.name = name;
     if (order) data.order = order;
 
+    if (req.file) {
+      data.image = req.file.path;
+    }
+
     const updateData = await CategoryModel.updateOne(
       { _id: id },
       {
-        $set: { ...data, slug, category_img: req?.file ? req?.file?.path : {} },
+        $set: data,
       }
     );
 

@@ -22,6 +22,7 @@ export const CategoryContext = ({ children }) => {
   const [sort, setSort] = useState(false);
   const [imageModal, setImageModal] = useState(false);
   const [currentModalImage, setCurrentModalImage] = useState(null);
+  const [currentImage, setCurrentImage] = useState(null);
 
   const navigate = useNavigate();
 
@@ -54,13 +55,14 @@ export const CategoryContext = ({ children }) => {
 
   // Handle Open Image Modal
   const handleOpenImageModal = (imgPath) => {
-    setCurrentModalImage(imgPath);
     setImageModal(true);
+    setCurrentModalImage(imgPath);
   };
 
   // Handle Image Close Modal
   const handleCloseImageModal = () => {
     setImageModal(false);
+    setCurrentModalImage(null);
   };
 
   // Handle Create Form
@@ -115,6 +117,7 @@ export const CategoryContext = ({ children }) => {
     const response = await getCategoryDetailById(updateId);
     if (response.success) {
       setCategoryDetails(response.data);
+      setCurrentImage(response.data.image);
     }
   };
 
@@ -149,6 +152,8 @@ export const CategoryContext = ({ children }) => {
     imageModal,
     currentPage,
     currentModalImage,
+    currentImage,
+    setCurrentImage,
     handleOpenModal,
     onCloseModal,
     handleCloseImageModal,

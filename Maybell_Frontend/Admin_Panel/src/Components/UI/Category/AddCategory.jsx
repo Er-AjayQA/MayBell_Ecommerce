@@ -14,6 +14,7 @@ import {
 
 export const AddCategory = () => {
   const {
+    currentImage,
     openModal,
     updateId,
     setUpdateId,
@@ -21,12 +22,11 @@ export const AddCategory = () => {
     onCloseModal,
     updateIdState,
     getAllCategoriesData,
+    setCurrentImage,
     categoryDetails,
   } = useContext(CategoryContextData);
 
-  const [imagePath, setImagePath] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [imageValue, setImageValue] = useState(null);
 
   const {
     register,
@@ -36,54 +36,61 @@ export const AddCategory = () => {
     formState: { errors },
   } = useForm();
 
+  // Handle Dropify Logic
   useEffect(() => {
     const dropifyElement = $("#categoryImage");
 
-    // Destroy existing Dropify instance if it exists
-    if (dropifyElement.data("dropify")) {
-      dropifyElement.dropify("destroy");
-    }
-
-    // Initialize Dropify with proper configuration
-    dropifyElement.dropify({
-      defaultFile: updateIdState ? imagePath : "",
-      messages: {
-        default: "Drag and drop a file or click to browse",
-        replace: "Drag and drop or click to replace",
-        remove: "Remove",
-        error: "Ooops, something wrong happened.",
-      },
-    });
-
-    // Handle file change
-    dropifyElement.on("change", function (event) {
-      if (event.target.files.length > 0) {
-        setImageValue(event.target.files[0]);
-      } else {
-        setImageValue(null);
+    // Initialize or reinitialize Dropify when currentImage changes
+    const initDropify = () => {
+      // Destroy existing instance if it exists
+      if (dropifyElement.data("dropify")) {
+        dropifyElement.dropify("destroy");
       }
-    });
+
+      // Initialize Dropify with current file
+      dropifyElement.dropify({
+        defaultFile: currentImage || "",
+        messages: {
+          default: "Drag and drop a file or click to select",
+          replace: "Drag and drop or click to replace",
+          remove: "Remove",
+          error: "Ooops, something wrong happened.",
+        },
+      });
+
+      // Handle file changes
+      dropifyElement.on("change", function (event) {
+        if (event.target.files && event.target.files[0]) {
+          const newImage = URL.createObjectURL(event.target.files[0]);
+          setCurrentImage(newImage);
+        }
+      });
+    };
+
+    initDropify();
 
     return () => {
+      // Cleanup
       dropifyElement.off("change");
       if (dropifyElement.data("dropify")) {
         dropifyElement.dropify("destroy");
       }
     };
-  }, [imagePath, updateIdState]);
-
+  }, [currentImage, setCurrentImage]);
   const onSubmit = async (data) => {
     try {
       setIsLoading(true);
 
-      const formData = new FormData();
+      let formData = new FormData();
+
       formData.append("name", data.name);
-      formData.append("order", data.order || "");
+      formData.append("order", data.order);
 
-      if (imageValue) {
-        formData.append("image", imageValue);
+      // Get the file input element
+      const fileInput = document.getElementById("categoryImage");
+      if (fileInput.files.length > 0) {
+        formData.append("categoryImage", fileInput.files[0]);
       }
-
       let response;
 
       if (updateIdState) {
@@ -97,8 +104,6 @@ export const AddCategory = () => {
       if (response.success) {
         toast.success(response.message);
         reset();
-        setImageValue(null);
-        setImagePath("");
         onCloseModal();
         getAllCategoriesData();
         if (updateIdState) {
@@ -116,18 +121,24 @@ export const AddCategory = () => {
     }
   };
 
+  // Handle Create Form Visibility
+  const handleFormVisibility = () => {
+    reset();
+    createForm();
+  };
+
   useEffect(() => {
     if (updateIdState && categoryDetails) {
       setValue("name", categoryDetails.name);
       setValue("order", categoryDetails.order);
-      setImagePath(categoryDetails.image_path + categoryDetails.image);
     } else {
       reset({
         name: "",
         order: "",
       });
+      setCurrentImage(null);
     }
-  }, [updateIdState, categoryDetails, openModal, setValue, reset]);
+  }, [updateIdState, categoryDetails, setValue, reset]);
 
   return (
     <>
@@ -147,60 +158,67 @@ export const AddCategory = () => {
                 onSubmit={handleSubmit(onSubmit)}
                 autoComplete="off"
               >
-                <div className="mb-5">
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Category Banner Image
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    // {...register("image", { required: "Category image is required" })}
-                    id="categoryImage"
-                    name="image"
-                    data-default-file={imagePath}
-                    className="dropify"
-                    data-height="250"
-                  />
-                  {errors.image && (
-                    <p className="text-red-500">{errors.image.message}</p>
-                  )}
+                <div className="flex gap-5">
+                  <div className="basis-[50%]">
+                    <div className="mb-5">
+                      <label
+                        htmlFor="categoryImage"
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      >
+                        Category Banner Image
+                      </label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        // {...register("image", { required: "Category image is required" })}
+                        id="categoryImage"
+                        name="image"
+                        data-default-file={currentImage}
+                        className="dropify"
+                        data-height="250"
+                      />
+                    </div>
+                  </div>
+                  <div className="basis-[50%]">
+                    <div className="mb-5">
+                      <label
+                        htmlFor="name"
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      >
+                        Category Name
+                      </label>
+                      <input
+                        type="text"
+                        id="name"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        placeholder="category name"
+                        {...register("name", {
+                          required: "Category name is required",
+                        })}
+                      />
+                      {errors.name && (
+                        <p className="text-red-500">{errors.name.message}</p>
+                      )}
+                    </div>
+                    <div className="mb-5">
+                      <label
+                        htmlFor="order"
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      >
+                        Order
+                      </label>
+                      <input
+                        type="number"
+                        id="order"
+                        {...register("order")}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        placeholder="1"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="mb-5">
-                  <label
-                    htmlFor="name"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Category Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="category name"
-                    {...register("name", {
-                      required: "Category name is required",
-                    })}
-                  />
-                  {errors.name && (
-                    <p className="text-red-500">{errors.name.message}</p>
-                  )}
-                </div>
-                <div className="mb-5">
-                  <label
-                    htmlFor="order"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Order
-                  </label>
-                  <input
-                    type="number"
-                    id="order"
-                    {...register("order")}
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="1"
-                  />
-                </div>
-                <div className="flex justify-end gap-2">
+
+                <div className="flex justify-end gap-2 mt-2">
                   <Link
                     to={"/furniture/admin-panel/category"}
                     type="submit"
