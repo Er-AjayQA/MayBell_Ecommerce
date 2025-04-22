@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { Modal, ModalBody, ModalHeader, Spinner } from "flowbite-react";
 import { Link } from "react-router-dom";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import $ from "jquery";
 import "dropify/dist/css/dropify.min.css";
 import "dropify/dist/js/dropify.min.js";
@@ -27,7 +27,6 @@ export const AddCategory = () => {
   const [imagePath, setImagePath] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [imageValue, setImageValue] = useState(null);
-  const fileInputRef = useRef(null);
 
   const {
     register,
@@ -81,8 +80,8 @@ export const AddCategory = () => {
       formData.append("name", data.name);
       formData.append("order", data.order || "");
 
-      if (fileInputRef.current?.files[0]) {
-        formData.append("image", fileInputRef.current.files[0]);
+      if (imageValue) {
+        formData.append("image", imageValue);
       }
 
       let response;
@@ -139,7 +138,7 @@ export const AddCategory = () => {
           <div className=" rounded-md bg-white z-[999] p-5 min-w-[500px]">
             <div className="mb-3 flex items-center justify-between">
               <h1 className="py-3 font-bold">
-                {updateIdState ? "Update Color" : "Create Color"}
+                {updateIdState ? "Update Category" : "Create Category"}
               </h1>
             </div>
             <div>
@@ -149,15 +148,11 @@ export const AddCategory = () => {
                 autoComplete="off"
               >
                 <div className="mb-5">
-                  <label
-                    htmlFor="categoryImage"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
+                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Category Banner Image
                   </label>
                   <input
                     type="file"
-                    ref={fileInputRef}
                     accept="image/*"
                     // {...register("image", { required: "Category image is required" })}
                     id="categoryImage"
