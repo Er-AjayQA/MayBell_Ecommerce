@@ -21,12 +21,13 @@ import { Configurations } from "./Components/Pages/Configurations";
 import { Faq } from "./Components/Pages/Faq";
 import { CmsPages } from "./Components/Pages/CmsPages";
 import { BodyLayout } from "./Components/Layouts/BodyLayout";
-import { Category } from "./Components/Pages/Category";
 import { SubCategory } from "./Components/Pages/SubCategory";
 import { MaterialTableListing } from "./Components/Pages/Materials/MaterialListing";
 import { MaterialContext } from "./Context/MaterialsContext";
 import { ColorsTableListing } from "./Components/Pages/Colors/ColorsListing";
 import { ColorsContext } from "./Context/ColorsContext";
+import { CategoryContext } from "./Context/CategoryContext";
+import { CategoryTableListing } from "./Components/Pages/Category/CategoryListing";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -60,10 +61,31 @@ createRoot(document.getElementById("root")).render(
             />
 
             {/* Category Route Start */}
-            <Route path="/furniture/admin-panel/">
-              <Route path="categories" element={<Category />} />
-              <Route path="categories/create" element={<Category />} />
-              <Route path="categories/update/:id" element={<Category />} />
+            <Route path="/furniture/admin-panel/category">
+              <Route
+                path="create"
+                element={
+                  <CategoryContext>
+                    <CategoryTableListing />
+                  </CategoryContext>
+                }
+              />
+              <Route
+                path="update/:id"
+                element={
+                  <CategoryContext>
+                    <CategoryTableListing />
+                  </CategoryContext>
+                }
+              />
+              <Route
+                path=""
+                element={
+                  <CategoryContext>
+                    <CategoryTableListing />
+                  </CategoryContext>
+                }
+              />
             </Route>
             {/* Category Route End */}
 
