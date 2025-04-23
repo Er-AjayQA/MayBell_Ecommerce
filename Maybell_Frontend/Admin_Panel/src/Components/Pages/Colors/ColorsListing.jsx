@@ -8,7 +8,6 @@ import { TbArrowsSort } from "react-icons/tb";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import { BreadCrumb } from "../../UI/Breadcrumb";
-import { useForm } from "react-hook-form";
 import ColorsContextData from "../../../Context/ColorsContext";
 import { ColorsFilterForm } from "../../UI/Colors/ColorsFilterForm";
 import { AddColors } from "../../UI/Colors/AddColors";
@@ -18,6 +17,9 @@ import {
   deleteColorService,
   deleteMultipleColorsService,
 } from "../../../Services/ColorServices";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable"; // Import autoTable separately
+import Papa from "papaparse";
 
 export const ColorsTableListing = () => {
   const {
@@ -34,8 +36,99 @@ export const ColorsTableListing = () => {
     handleSortData,
   } = useContext(ColorsContextData);
 
-  const { setValue } = useForm();
   const [selectedRecords, setSelectedRecords] = useState([]);
+
+  // Handle Download CSV
+  const handleDownloadCSV = () => {
+    const dataToExport = allColors.map((color) => ({
+      Name: color.name,
+      Order: color.order || "N/A",
+      code: color.colorCode || "N/A",
+      Status: color.status ? "Active" : "Inactive",
+    }));
+
+    const csv = Papa.unparse(dataToExport);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "colorsList.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Handle Download PDF - Fixed version
+  const handleDownloadPDF = () => {
+    try {
+      const doc = new jsPDF();
+
+      // Add title
+      doc.setFontSize(16);
+      doc.text("Colors List", 14, 15);
+
+      // Prepare data for the table
+      const headers = [["Name", "Order", "Color Code", "Preview", "Status"]];
+      const tableData = allColors.map((color) => [
+        color.name,
+        color.order || "N/A",
+        color.colorCode || "N/A",
+        "",
+        color.status ? "Active" : "Inactive",
+      ]);
+
+      // Add table using the separately imported autoTable
+      autoTable(doc, {
+        theme: "grid",
+        head: headers,
+        body: tableData,
+        startY: 25,
+        styles: {
+          cellPadding: 3,
+          fontSize: 9,
+          valign: "middle",
+          halign: "center",
+        },
+        headStyles: {
+          fillColor: [62, 142, 247],
+          textColor: 255,
+          fontStyle: "bold",
+          cellWidth: "wrap",
+        },
+        alternateRowStyles: {
+          fillColor: [240, 240, 240],
+        },
+        columnStyles: {
+          1: {
+            // This is the index of the "Category Image" column (0-based)
+            cellWidth: 60, // Set your desired fixed width here (in mm)
+          },
+        },
+        didDrawCell: (data) => {
+          // Only draw color swatches in the Preview column (index 3)
+          if (data.column.index === 3 && data.cell.section === "body") {
+            const color = allColors[data.row.index];
+            if (color.colorCode) {
+              doc.setFillColor(color.colorCode);
+              doc.rect(
+                data.cell.x + 2,
+                data.cell.y + 2,
+                data.cell.width - 4,
+                data.cell.height - 4,
+                "F"
+              );
+            }
+          }
+        },
+      });
+
+      // Save the PDF
+      doc.save("colorsList.pdf");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("Failed to generate PDF");
+    }
+  };
 
   // Handle Checkbox Check
   const handleCheckboxSelection = (id) => {
@@ -181,12 +274,18 @@ export const ColorsTableListing = () => {
                   </button>
                 </Tooltip>
                 <Tooltip content="Download CSV" placement="top">
-                  <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200">
+                  <button
+                    className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200"
+                    onClick={handleDownloadCSV}
+                  >
                     <GrDocumentCsv />
                   </button>
                 </Tooltip>
                 <Tooltip content="Download PDF" placement="top">
-                  <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200">
+                  <button
+                    className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200"
+                    onClick={handleDownloadPDF}
+                  >
                     <FaFilePdf />
                   </button>
                 </Tooltip>

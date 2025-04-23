@@ -18,16 +18,13 @@ import { TbArrowsSort } from "react-icons/tb";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import { BreadCrumb } from "../../UI/Breadcrumb";
-import { useForm } from "react-hook-form";
-import {
-  changeColorsStatusService,
-  deleteColorService,
-  deleteMultipleColorsService,
-} from "../../../Services/ColorServices";
 import { CategoryFilterForm } from "../../UI/Category/CategoryFilterForm";
 import { AddCategory } from "../../UI/Category/AddCategory";
 import CategoryContextData from "../../../Context/CategoryContext";
 import { BreadCrumbActionButtons } from "../../UI/Category/ActionButtons";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable"; // Import autoTable separately
+import Papa from "papaparse";
 import {
   changeCategoryStatusService,
   deleteCategoryService,
@@ -53,8 +50,103 @@ export const CategoryTableListing = () => {
     handleOpenImageModal,
   } = useContext(CategoryContextData);
 
-  const { setValue } = useForm();
   const [selectedRecords, setSelectedRecords] = useState([]);
+
+  // Handle Download CSV
+  const handleDownloadCSV = () => {
+    const dataToExport = allCategories.map((category) => ({
+      Name: category.name,
+      "Banner Image": category.image
+        ? `=HYPERLINK("${category.image}", "Click to View")`
+        : "N/A",
+      Order: category.order || "N/A",
+      Status: category.status ? "Active" : "Inactive",
+    }));
+
+    const csv = Papa.unparse(dataToExport);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "categoriesList.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Handle Download PDF - Fixed version
+  const handleDownloadPDF = () => {
+    try {
+      const doc = new jsPDF();
+
+      // Add title
+      doc.setFontSize(16);
+      doc.text("Categories List", 14, 15);
+
+      // Prepare data for the table
+      const headers = [["Name", "Category Image", "Order", "Status"]];
+      const tableData = allCategories.map((category) => [
+        category.name,
+        category.image ? "View" : "N/A",
+        category.order || "N/A",
+        category.status ? "Active" : "Inactive",
+      ]);
+
+      // Add table using the separately imported autoTable
+      autoTable(doc, {
+        theme: "grid",
+        head: headers,
+        body: tableData,
+        startY: 25,
+        styles: {
+          cellPadding: 3,
+          fontSize: 9,
+          valign: "middle",
+          halign: "center",
+        },
+        headStyles: {
+          fillColor: [62, 142, 247],
+          textColor: 255,
+          fontStyle: "bold",
+          cellWidth: "wrap",
+        },
+        alternateRowStyles: {
+          fillColor: [240, 240, 240],
+        },
+        columnStyles: {
+          1: {
+            // This is the index of the "Category Image" column (0-based)
+            cellWidth: 60, // Set your desired fixed width here (in mm)
+          },
+        },
+        didDrawCell: (data) => {
+          // Check if we're drawing the image column (index 1) and cell has content
+          if (data.column.index === 1 && data.cell.raw === "View") {
+            const category = allCategories[data.row.index];
+            if (category.image) {
+              // Add clickable link with new window flag
+              doc.link(
+                data.cell.x,
+                data.cell.y,
+                data.cell.width,
+                data.cell.height,
+                {
+                  url: category.image,
+                  newWindow: true, // This flag should theoretically open in new window
+                }
+              );
+            }
+          }
+        },
+      });
+
+      // Save the PDF
+      doc.save("categoriesList.pdf");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("Failed to generate PDF");
+    }
+  };
 
   // Handle Checkbox Check
   const handleCheckboxSelection = (id) => {
@@ -200,12 +292,18 @@ export const CategoryTableListing = () => {
                   </button>
                 </Tooltip>
                 <Tooltip content="Download CSV" placement="top">
-                  <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200">
+                  <button
+                    className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200"
+                    onClick={handleDownloadCSV}
+                  >
                     <GrDocumentCsv />
                   </button>
                 </Tooltip>
                 <Tooltip content="Download PDF" placement="top">
-                  <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200">
+                  <button
+                    className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200"
+                    onClick={handleDownloadPDF}
+                  >
                     <FaFilePdf />
                   </button>
                 </Tooltip>
@@ -267,7 +365,7 @@ export const CategoryTableListing = () => {
                             <>
                               <img
                                 src={category?.image}
-                                className="w-[50px] h-[50px] mx-auto cursor-pointer"
+                                className="w-[50px] h-[50px] mx-auto cursor-pointer object-contain"
                                 onClick={() => {
                                   handleOpenImageModal(category?.image);
                                 }}
@@ -281,7 +379,7 @@ export const CategoryTableListing = () => {
                                   <div className="space-y-6">
                                     <img
                                       src={currentModalImage}
-                                      className="w-[350px] h-[350px] mx-auto"
+                                      className="w-[350px] h-[350px] mx-auto object-contain"
                                       onClick={() => setOpenModal(true)}
                                     />
                                   </div>

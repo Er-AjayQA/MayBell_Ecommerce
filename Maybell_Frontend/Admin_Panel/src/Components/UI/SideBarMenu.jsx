@@ -68,7 +68,7 @@ export const SideBarMenu = () => {
         {
           id: 110,
           name: "Materials",
-          url: "/furniture/admin-panel/materials/listing",
+          url: "/furniture/admin-panel/materials",
         },
         { id: 111, name: "Colors", url: "/furniture/admin-panel/colors" },
         { id: 112, name: "Products", url: "/furniture/admin-panel/products" },
