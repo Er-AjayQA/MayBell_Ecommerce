@@ -63,7 +63,7 @@ export const SideBarMenu = () => {
         {
           id: 109,
           name: "SubCategories",
-          url: "/furniture/admin-panel/sub-categories",
+          url: "/furniture/admin-panel/sub-category",
         },
         {
           id: 110,

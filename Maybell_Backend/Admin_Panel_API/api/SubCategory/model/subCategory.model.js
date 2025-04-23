@@ -13,6 +13,7 @@ const SubCategorySchema = new mongoose.Schema({
   category_id: {
     type: String,
     required: true,
+    ref: "category",
   },
   subCategory_img: { type: String },
   order: { type: Number, min: 0, max: 10000, default: 0 },

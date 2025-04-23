@@ -1,15 +1,11 @@
-import { useContext } from "react";
 import { IoMdSearch } from "react-icons/io";
-import SubCategoryContextData from "../../../Context/SubCategoryContext";
 
-export const SubCategoryFilterForm = () => {
-  const {
-    filterFormStatus,
-    filterData,
-    handleFilterData,
-    handleClearFilterForm,
-  } = useContext(SubCategoryContextData);
-
+export const SubCategoryFilterForm = ({
+  filterFormStatus,
+  filterData,
+  filterFormData,
+  filterFormReset,
+}) => {
   return (
     <>
       {/* Filter Section Start */}
@@ -32,14 +28,14 @@ export const SubCategoryFilterForm = () => {
             placeholder="Name"
             value={filterData.name}
             className="py-1 px-3 rounded-lg basis-[30%]"
-            onChange={(event) => handleFilterData(event)}
+            onChange={(event) => filterFormData(event)}
           />
           <button className="flex items-center justify-center gap-2 py-1 px-4 bg-[#3e8ef7] text-white rounded-lg hover:bg-[#589FFC] transition-all duration-500 ease-in-out">
             <IoMdSearch className="text-[16px]" /> Filter Materials
           </button>
           <button
             className="py-1 px-4 bg-[#3e8ef7] text-white rounded-lg hover:bg-[#589FFC] transition-all duration-500 ease-in-out"
-            onClick={() => handleClearFilterForm()}
+            onClick={() => filterFormReset()}
           >
             Clear
           </button>

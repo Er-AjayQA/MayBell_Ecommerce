@@ -21,13 +21,14 @@ import { Configurations } from "./Components/Pages/Configurations";
 import { Faq } from "./Components/Pages/Faq";
 import { CmsPages } from "./Components/Pages/CmsPages";
 import { BodyLayout } from "./Components/Layouts/BodyLayout";
-import { SubCategory } from "./Components/Pages/SubCategory";
 import { MaterialTableListing } from "./Components/Pages/Materials/MaterialListing";
 import { MaterialContext } from "./Context/MaterialsContext";
 import { ColorsTableListing } from "./Components/Pages/Colors/ColorsListing";
 import { ColorsContext } from "./Context/ColorsContext";
 import { CategoryContext } from "./Context/CategoryContext";
 import { CategoryTableListing } from "./Components/Pages/Category/CategoryListing";
+import { SubCategoryContext } from "./Context/SubCategoryContext";
+import { SubCategoryTableListing } from "./Components/Pages/SubCategory/SubCategoryListing";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -90,12 +91,30 @@ createRoot(document.getElementById("root")).render(
             {/* Category Route End */}
 
             {/* SubCategory Route Start */}
-            <Route path="/furniture/admin-panel/">
-              <Route path="sub-categories" element={<SubCategory />} />
-              <Route path="sub-categories/create" element={<SubCategory />} />
+            <Route path="/furniture/admin-panel/sub-category">
               <Route
-                path="sub-categories/update/:id"
-                element={<SubCategory />}
+                path="create"
+                element={
+                  <SubCategoryContext>
+                    <SubCategoryTableListing />
+                  </SubCategoryContext>
+                }
+              />
+              <Route
+                path="update/:id"
+                element={
+                  <SubCategoryContext>
+                    <SubCategoryTableListing />
+                  </SubCategoryContext>
+                }
+              />
+              <Route
+                path=""
+                element={
+                  <SubCategoryContext>
+                    <SubCategoryTableListing />
+                  </SubCategoryContext>
+                }
               />
             </Route>
             {/* SubCategory Route End */}

@@ -67,7 +67,7 @@ exports.create = async (req, res) => {
   }
 };
 
-// Get All Colors
+// Get All SubCategories
 exports.getAll = async (req, res) => {
   try {
     let limit = parseInt(req?.body?.limit) || 15;
@@ -89,6 +89,7 @@ exports.getAll = async (req, res) => {
     const totalRecords = await SubCategoryModel.countDocuments(filter);
 
     const getAllData = await SubCategoryModel.find(filter)
+      .populate({ path: "category_id", select: "name" })
       .limit(limit)
       .skip(skip)
       .sort({
@@ -122,7 +123,10 @@ exports.getDetails = async (req, res) => {
 
     const filter = { deletedAt: null };
 
-    const getDetails = await SubCategoryModel.findOne({ ...filter, _id: id });
+    const getDetails = await SubCategoryModel.findOne({
+      ...filter,
+      _id: id,
+    }).populate({ path: "category_id", select: "name" });
 
     const success = !getDetails ? false : true;
     const responseStatus = !getDetails ? 404 : 200;
