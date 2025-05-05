@@ -41,6 +41,7 @@ export const SubCategoryTableListing = () => {
     totalPages,
     currentModalImage,
     handleFilterData,
+    handleClearFilterForm,
     onPageChange,
     handleUpdateId,
     handleSelection,
@@ -287,6 +288,9 @@ export const SubCategoryTableListing = () => {
                     className="block py-1 px-3 text-sm text-gray-600 border rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
                     onChange={(event) => handleFilterData(event)}
                   />
+                </div>
+                <div className="flex items-center gap-1">
+                  <button onClick={handleClearFilterForm}>Clear</button>
                 </div>
               </form>
             </div>
