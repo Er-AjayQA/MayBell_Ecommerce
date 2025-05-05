@@ -17,9 +17,9 @@ const storage = new CloudinaryStorage({
   },
 });
 
-const categoryImages = multer({ storage: storage });
+const subCategoryImages = multer({ storage: storage });
 
-const singleImage = categoryImages.single("categoryImage");
+const singleImage = subCategoryImages.single("subCategory_img");
 
 // Define Routes
 router.post("/create", singleImage, SubCategoryController.create);

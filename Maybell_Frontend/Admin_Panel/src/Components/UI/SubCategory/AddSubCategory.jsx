@@ -6,6 +6,7 @@ import { useContext, useEffect, useState } from "react";
 import $ from "jquery";
 import "dropify/dist/css/dropify.min.css";
 import "dropify/dist/js/dropify.min.js";
+import { getAllCategoryService } from "../../../Services/CategoryServices";
 import SubCategoryContextData from "../../../Context/SubCategoryContext";
 import {
   createSubCategoryService,
@@ -21,15 +22,14 @@ export const AddSubCategory = () => {
     setUpdateIdState,
     onCloseModal,
     updateIdState,
-    allActiveCategoriesList,
     getAllSubCategoriesData,
+    getAllActiveCategories,
+    allActiveCategories,
     setCurrentImage,
     subCategoryDetails,
   } = useContext(SubCategoryContextData);
 
   const [isLoading, setIsLoading] = useState(false);
-
-  console.log(subCategoryDetails);
 
   const {
     register,
@@ -41,7 +41,7 @@ export const AddSubCategory = () => {
 
   // Handle Dropify Logic
   useEffect(() => {
-    const dropifyElement = $("#categoryImage");
+    const dropifyElement = $("#subCategory_img");
 
     // Initialize or reinitialize Dropify when currentImage changes
     const initDropify = () => {
@@ -91,17 +91,19 @@ export const AddSubCategory = () => {
       formData.append("category_id", data.category_id);
 
       // Get the file input element
-      const fileInput = document.getElementById("categoryImage");
+      const fileInput = document.getElementById("subCategory_img");
       if (fileInput.files.length > 0) {
-        formData.append("categoryImage", fileInput.files[0]);
+        formData.append("subCategory_img", fileInput.files[0]);
+      } else if (currentImage && updateIdState) {
+        // If no new file but in update mode, keep the existing image
+        formData.append("existingImage", currentImage);
       }
+
       let response;
 
       if (updateIdState) {
-        console.log("Update Scenario ======", data);
         response = await updateSubCategoryService(updateId, formData);
       } else {
-        console.log("New Record Scenario ======", data);
         response = await createSubCategoryService(formData);
       }
 
@@ -127,17 +129,26 @@ export const AddSubCategory = () => {
 
   useEffect(() => {
     if (updateIdState && subCategoryDetails) {
+      setValue("category_id", subCategoryDetails.category_id?._id);
       setValue("name", subCategoryDetails.name);
       setValue("order", subCategoryDetails.order);
-      setValue("category_id", subCategoryDetails.category_id.name);
+      // Set image from subCategoryDetails if it exists
+      if (subCategoryDetails.subCategory_img) {
+        setCurrentImage(subCategoryDetails.subCategory_img);
+      }
     } else {
       reset({
         name: "",
         order: "",
+        category_id: "",
       });
       setCurrentImage(null);
     }
   }, [updateIdState, subCategoryDetails, setValue, reset]);
+
+  useEffect(() => {
+    getAllActiveCategories();
+  }, []);
 
   return (
     <>
@@ -161,7 +172,7 @@ export const AddSubCategory = () => {
                   <div className="basis-[50%]">
                     <div className="mb-5">
                       <label
-                        htmlFor="categoryImage"
+                        htmlFor="subCategory_img"
                         className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                       >
                         Banner Image
@@ -169,9 +180,8 @@ export const AddSubCategory = () => {
                       <input
                         type="file"
                         accept="image/*"
-                        // {...register("image", { required: "Category image is required" })}
-                        id="categoryImage"
-                        name="image"
+                        id="subCategory_img"
+                        name="subCategory_img"
                         data-default-file={currentImage}
                         className="dropify"
                         data-height="250"
@@ -184,26 +194,27 @@ export const AddSubCategory = () => {
                         htmlFor="category_id"
                         className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                       >
-                        Parent Category
+                        Category Name
                       </label>
                       <select
                         type="text"
                         id="category_id"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        placeholder="parent category name"
                         {...register("category_id", {
                           required: "Parent Category name is required",
                         })}
                       >
-                        <option disabled>Select Category</option>
-                        {allActiveCategoriesList?.length > 0 ? (
-                          allActiveCategoriesList.map((activeCategory) => {
+                        <option disabled>--- Select ---</option>
+                        {allActiveCategories.length > 0 ? (
+                          allActiveCategories.map((category) => {
                             return (
                               <>
                                 <option
-                                  key={activeCategory._id}
-                                  value={activeCategory._id}
+                                  key={category?._id}
+                                  value={category?._id}
                                 >
-                                  {activeCategory.name}
+                                  {category?.name}
                                 </option>
                               </>
                             );
@@ -213,7 +224,9 @@ export const AddSubCategory = () => {
                         )}
                       </select>
                       {errors.name && (
-                        <p className="text-red-500">{errors.name.message}</p>
+                        <p className="text-red-500">
+                          {errors.category_id.message}
+                        </p>
                       )}
                     </div>
                     <div className="mb-5">

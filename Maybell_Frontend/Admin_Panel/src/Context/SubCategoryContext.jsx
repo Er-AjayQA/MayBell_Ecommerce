@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   getAllCategoryService,
   getCategoryDetailById,
@@ -16,10 +16,10 @@ export const SubCategoryContext = ({ children }) => {
   const [filterFormStatus, setFilterFormStatus] = useState(false);
   const [filterData, setFilterData] = useState({ name: "" });
   const [allSubCategories, setAllSubCategories] = useState([]);
+  const [allActiveCategories, setAllActiveCategories] = useState([]);
   const [updateId, setUpdateId] = useState(null);
   const [subCategoryDetails, setSubCategoryDetails] = useState([]);
   const [updateIdState, setUpdateIdState] = useState(false);
-  const [allActiveCategoriesList, setAllActiveCategoriesList] = useState([]);
   const [totalRecords, setTotalRecords] = useState(null);
   const [currentLimit, setCurrentLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,7 +30,6 @@ export const SubCategoryContext = ({ children }) => {
   const [currentImage, setCurrentImage] = useState(null);
 
   const navigate = useNavigate();
-  const params = useParams();
 
   // Handle Filter Form Visibility
   const handleFilterFormVisibility = () => {
@@ -45,7 +44,7 @@ export const SubCategoryContext = ({ children }) => {
 
   // Handle Clear Filter Form
   const handleClearFilterForm = () => {
-    setFilterData({ name: "" });
+    setFilterData({ name: "", category_id: "" });
   };
 
   // Handle Open Create Form
@@ -53,7 +52,6 @@ export const SubCategoryContext = ({ children }) => {
     setOpenModal(true);
 
     if (type === "create") {
-      getAllActiveCategoriesData();
       setUpdateId(null);
       setUpdateIdState(false);
       setSubCategoryDetails([]);
@@ -80,31 +78,14 @@ export const SubCategoryContext = ({ children }) => {
     navigate("/furniture/admin-panel/sub-category");
   };
 
-  // Get All Existing Active Categories
-  const getAllActiveCategoriesData = async () => {
-    let filter = {
-      limit: 1000,
-      sort: "",
-      status: true,
-    };
-
-    const response = await getAllCategoryService(filter);
-
-    if (response.success) {
-      setAllActiveCategoriesList(response.data);
-    }
-  };
-
   // Get All Existing SubCategories
   const getAllSubCategoriesData = async () => {
-    let filter = {
+    const response = await getAllSubCategoryService({
       ...filterData,
       limit: currentLimit,
       page: currentPage,
       sort: sort,
-    };
-
-    const response = await getAllSubCategoryService(filter);
+    });
 
     if (response.success) {
       setTotalPages(response.totalPages);
@@ -121,10 +102,13 @@ export const SubCategoryContext = ({ children }) => {
 
   // Handle Set Update Id
   const handleUpdateId = (id, type) => {
-    console.log("Update ID=======", updateId);
-    setUpdateId(id);
     handleOpenModal(type);
-    getAllActiveCategoriesData();
+
+    if (type === "update") {
+      setUpdateId(id);
+    } else {
+      setUpdateId(null);
+    }
   };
 
   // Handle Current Limit
@@ -134,7 +118,7 @@ export const SubCategoryContext = ({ children }) => {
 
   // Get SubCategory Detail
   const getSubCategoryById = async () => {
-    const response = await getSubCategoryDetailById(params.id);
+    const response = await getSubCategoryDetailById(updateId);
     if (response.success) {
       setSubCategoryDetails(response.data);
       setCurrentImage(response.data.image);
@@ -146,12 +130,24 @@ export const SubCategoryContext = ({ children }) => {
     setSort((prev) => !prev);
   };
 
+  // Get All Active Categories
+  const getAllActiveCategories = async () => {
+    let formData = { status: true };
+    let response = await getAllCategoryService(formData);
+
+    if (response.success) {
+      setAllActiveCategories(response.data);
+    } else {
+      setAllActiveCategories([]);
+    }
+  };
+
   useEffect(() => {
     getAllSubCategoriesData(currentLimit);
   }, [filterData, currentLimit, currentPage, sort]);
 
   useEffect(() => {
-    if (!params.id) {
+    if (updateId === null) {
       setUpdateIdState(false);
     } else {
       setUpdateIdState(true);
@@ -173,8 +169,9 @@ export const SubCategoryContext = ({ children }) => {
     currentPage,
     currentModalImage,
     currentImage,
-    allActiveCategoriesList,
+    allActiveCategories,
     setCurrentImage,
+    getAllActiveCategories,
     handleOpenModal,
     onCloseModal,
     handleCloseImageModal,
@@ -189,7 +186,6 @@ export const SubCategoryContext = ({ children }) => {
     handleUpdateId,
     handleSelection,
     handleOpenImageModal,
-    getAllActiveCategoriesData,
     getAllSubCategoriesData,
   };
 

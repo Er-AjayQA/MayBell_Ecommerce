@@ -21,15 +21,10 @@ import { BreadCrumb } from "../../UI/Breadcrumb";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable"; // Import autoTable separately
 import Papa from "papaparse";
-import {
-  changeCategoryStatusService,
-  deleteCategoryService,
-  deleteMultipleCategoryService,
-} from "../../../Services/CategoryServices";
-import SubCategoryContextData from "../../../Context/SubCategoryContext";
-import { BreadCrumbActionButtons } from "../../UI/SubCategory/ActionButtons";
 import { SubCategoryFilterForm } from "../../UI/SubCategory/SubCategoryFilterForm";
 import { AddSubCategory } from "../../UI/SubCategory/AddSubCategory";
+import SubCategoryContextData from "../../../Context/SubCategoryContext";
+import { BreadCrumbActionButtons } from "../../UI/SubCategory/ActionButtons";
 import {
   changeSubCategoryStatusService,
   deleteMultipleSubCategoryService,
@@ -49,6 +44,7 @@ export const SubCategoryTableListing = () => {
     onPageChange,
     handleUpdateId,
     handleSelection,
+    allActiveCategories,
     getAllSubCategoriesData,
     handleSortData,
     handleCloseImageModal,
@@ -59,7 +55,7 @@ export const SubCategoryTableListing = () => {
 
   // Handle Download CSV
   const handleDownloadCSV = () => {
-    const dataToExport = allSubCategories.map((category) => ({
+    const dataToExport = allCategories.map((category) => ({
       Name: category.name,
       "Banner Image": category.image
         ? `=HYPERLINK("${category.image}", "Click to View")`
@@ -90,7 +86,7 @@ export const SubCategoryTableListing = () => {
 
       // Prepare data for the table
       const headers = [["Name", "Category Image", "Order", "Status"]];
-      const tableData = allSubCategories.map((category) => [
+      const tableData = allCategories.map((category) => [
         category.name,
         category.image ? "View" : "N/A",
         category.order || "N/A",
@@ -127,7 +123,7 @@ export const SubCategoryTableListing = () => {
         didDrawCell: (data) => {
           // Check if we're drawing the image column (index 1) and cell has content
           if (data.column.index === 1 && data.cell.raw === "View") {
-            const category = allSubCategories[data.row.index];
+            const category = allCategories[data.row.index];
             if (category.image) {
               // Add clickable link with new window flag
               doc.link(
@@ -148,7 +144,6 @@ export const SubCategoryTableListing = () => {
       // Save the PDF
       doc.save("categoriesList.pdf");
     } catch (error) {
-      console.error("Error generating PDF:", error);
       toast.error("Failed to generate PDF");
     }
   };
@@ -168,8 +163,8 @@ export const SubCategoryTableListing = () => {
   // Handle Select All Checkboxes
   const handleSelectAllCheckboxes = (event) => {
     if (event.target.checked) {
-      const data = allSubCategories.map((material) => {
-        return material._id;
+      const data = allSubCategories.map((subCategory) => {
+        return subCategory._id;
       });
       setSelectedRecords(data);
     } else {
@@ -188,7 +183,7 @@ export const SubCategoryTableListing = () => {
   };
 
   // Handle Delete Materials
-  const handleDeleteSubCategory = async (id) => {
+  const handleDeleteCategory = async (id) => {
     const response = await deleteSubCategoryService({ id });
 
     if (response.success) {
@@ -198,7 +193,7 @@ export const SubCategoryTableListing = () => {
   };
 
   // Handle Delete Multiple Data
-  const handleDeleteMultipleSubCategories = async () => {
+  const handleDeleteMultipleCategories = async () => {
     const response = await deleteMultipleSubCategoryService({
       ids: selectedRecords,
     });
@@ -217,7 +212,7 @@ export const SubCategoryTableListing = () => {
         {/* Body Header Start */}
         <div className="flex items-center mb-3">
           {/* Breadcrumb Start */}
-          <BreadCrumb title={"Colors Listing"} subtitle={"Colors"} />
+          <BreadCrumb title={"SubCategory Listing"} subtitle={"SubCategory"} />
           {/* Breadcrumb End */}
 
           {/* Action Buttons Start */}
@@ -237,7 +232,7 @@ export const SubCategoryTableListing = () => {
             {/* Left Form Start */}
             <div className="leftForm">
               <form className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 ">
                   <label
                     htmlFor="countries"
                     className="block text-sm text-gray-600"
@@ -254,15 +249,35 @@ export const SubCategoryTableListing = () => {
                     <option value="100">100</option>
                     <option value="all">All</option>
                   </select>
-                  <span className="text-gray-600 text-sm">entries</span>
+                </div>
+                <div className="flex items-center gap-1 ms-5">
+                  <select
+                    type="text"
+                    id="category_id"
+                    name="category_id"
+                    className="bg-gray-50 border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full py-1 px-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="select category"
+                    onChange={(event) => handleFilterData(event)}
+                  >
+                    <option disabled selected>
+                      --- Search by parent category ---
+                    </option>
+                    {allActiveCategories.length > 0 ? (
+                      allActiveCategories.map((category) => {
+                        return (
+                          <>
+                            <option key={category?._id} value={category?._id}>
+                              {category?.name}
+                            </option>
+                          </>
+                        );
+                      })
+                    ) : (
+                      <option disabled>No records found</option>
+                    )}
+                  </select>
                 </div>
                 <div className="flex items-center gap-1">
-                  <label
-                    htmlFor="default-search"
-                    className="block text-sm text-gray-600"
-                  >
-                    Search:
-                  </label>
                   <input
                     type="search"
                     name="name"
@@ -291,7 +306,7 @@ export const SubCategoryTableListing = () => {
                 <Tooltip content="Delete Selected" placement="top">
                   <button
                     className="p-2 text-red-500 hover:bg-gray-100 rounded-lg border border-gray-200"
-                    onClick={handleDeleteMultipleSubCategories}
+                    onClick={handleDeleteMultipleCategories}
                   >
                     <RiDeleteBin5Fill />
                   </button>
@@ -334,12 +349,16 @@ export const SubCategoryTableListing = () => {
                     }
                   />
                 </Table.HeadCell>
-                <Table.HeadCell>Parent Category</Table.HeadCell>
-                <Table.HeadCell>Name</Table.HeadCell>
-                <Table.HeadCell>Image</Table.HeadCell>
-                <Table.HeadCell>Order</Table.HeadCell>
-                <Table.HeadCell>Status</Table.HeadCell>
-                <Table.HeadCell>Action</Table.HeadCell>
+                <Table.HeadCell className="capitalize">
+                  Parent Category Name
+                </Table.HeadCell>
+                <Table.HeadCell className="capitalize">
+                  SubCategory Name
+                </Table.HeadCell>
+                <Table.HeadCell className="capitalize">Image</Table.HeadCell>
+                <Table.HeadCell className="capitalize">Order</Table.HeadCell>
+                <Table.HeadCell className="capitalize">Status</Table.HeadCell>
+                <Table.HeadCell className="capitalize">Action</Table.HeadCell>
               </Table.Head>
 
               <Table.Body className="divide-y ">
@@ -347,8 +366,8 @@ export const SubCategoryTableListing = () => {
                   allSubCategories.map((subCategory) => {
                     return (
                       <Table.Row
-                        key={subCategory?._id}
                         className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center"
+                        key={subCategory?._id}
                       >
                         <Table.Cell className="p-4">
                           <Checkbox
@@ -370,22 +389,22 @@ export const SubCategoryTableListing = () => {
                           {subCategory?.name}
                         </Table.Cell>
                         <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                          {subCategory?.image ? (
+                          {subCategory?.subCategory_img ? (
                             <>
                               <img
-                                src={subCategory?.image}
+                                src={subCategory?.subCategory_img}
                                 className="w-[50px] h-[50px] mx-auto cursor-pointer object-contain"
                                 onClick={() => {
-                                  handleOpenImageModal(subCategory?.image);
+                                  handleOpenImageModal(
+                                    subCategory?.subCategory_img
+                                  );
                                 }}
                               />
                               <Modal
                                 show={imageModal}
                                 onClose={handleCloseImageModal}
                               >
-                                <ModalHeader>
-                                  SubCategory Banner Image
-                                </ModalHeader>
+                                <ModalHeader>Banner Image</ModalHeader>
                                 <ModalBody>
                                   <div className="space-y-6">
                                     <img
@@ -439,7 +458,7 @@ export const SubCategoryTableListing = () => {
                             <button
                               className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-red-600 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out"
                               onClick={() =>
-                                handleDeleteSubCategory(subCategory?._id)
+                                handleDeleteCategory(subCategory?._id)
                               }
                             >
                               <MdDeleteForever />

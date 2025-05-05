@@ -74,7 +74,7 @@ exports.getAll = async (req, res) => {
     let page = parseInt(req?.body?.page) || 1;
     if (limit < 1) limit = 15;
     if (page < 1) page = 1;
-    const { name, sort } = req.body;
+    const { name, sort, category_id } = req.body;
 
     let skip = (page - 1) * limit;
 
@@ -85,6 +85,9 @@ exports.getAll = async (req, res) => {
       filter.name = nameRegex;
     }
 
+    if (category_id) {
+      filter.category_id = category_id;
+    }
     // Calculate total number of records
     const totalRecords = await SubCategoryModel.countDocuments(filter);
 
