@@ -1,9 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  getAllCategoryService,
-  getCategoryDetailById,
-} from "../Services/CategoryServices";
+import { getAllCategoryService } from "../Services/CategoryServices";
 import {
   getAllSubCategoryService,
   getSubCategoryDetailById,
@@ -14,7 +11,7 @@ const SubCategoryContextData = createContext();
 export const SubCategoryContext = ({ children }) => {
   const [openModal, setOpenModal] = useState(false);
   const [filterFormStatus, setFilterFormStatus] = useState(false);
-  const [filterData, setFilterData] = useState({ name: "" });
+  const [filterData, setFilterData] = useState({ name: "", category_id: "" });
   const [allSubCategories, setAllSubCategories] = useState([]);
   const [allActiveCategories, setAllActiveCategories] = useState([]);
   const [updateId, setUpdateId] = useState(null);
@@ -43,7 +40,8 @@ export const SubCategoryContext = ({ children }) => {
   };
 
   // Handle Clear Filter Form
-  const handleClearFilterForm = () => {
+  const handleClearFilterForm = (e) => {
+    e.preventDefault();
     setFilterData({ name: "", category_id: "" });
   };
 

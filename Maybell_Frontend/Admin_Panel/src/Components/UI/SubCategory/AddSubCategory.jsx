@@ -6,7 +6,6 @@ import { useContext, useEffect, useState } from "react";
 import $ from "jquery";
 import "dropify/dist/css/dropify.min.css";
 import "dropify/dist/js/dropify.min.js";
-import { getAllCategoryService } from "../../../Services/CategoryServices";
 import SubCategoryContextData from "../../../Context/SubCategoryContext";
 import {
   createSubCategoryService,

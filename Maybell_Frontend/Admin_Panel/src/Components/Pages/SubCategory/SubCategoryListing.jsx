@@ -15,6 +15,7 @@ import { MdDeleteForever, MdEdit } from "react-icons/md";
 import { GrDocumentCsv } from "react-icons/gr";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { TbArrowsSort } from "react-icons/tb";
+import { RxCross2 } from "react-icons/rx";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import { BreadCrumb } from "../../UI/Breadcrumb";
@@ -257,12 +258,9 @@ export const SubCategoryTableListing = () => {
                     id="category_id"
                     name="category_id"
                     className="bg-gray-50 border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full py-1 px-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="select category"
                     onChange={(event) => handleFilterData(event)}
                   >
-                    <option disabled selected>
-                      --- Search by parent category ---
-                    </option>
+                    <option disabled>--- Search by parent category ---</option>
                     {allActiveCategories.length > 0 ? (
                       allActiveCategories.map((category) => {
                         return (
@@ -290,7 +288,9 @@ export const SubCategoryTableListing = () => {
                   />
                 </div>
                 <div className="flex items-center gap-1">
-                  <button onClick={handleClearFilterForm}>Clear</button>
+                  <button onClick={handleClearFilterForm}>
+                    <RxCross2 />
+                  </button>
                 </div>
               </form>
             </div>
