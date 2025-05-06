@@ -34,9 +34,6 @@ export const UomFilterForm = () => {
             className="py-1 px-3 rounded-lg basis-[30%]"
             onChange={(event) => handleFilterData(event)}
           />
-          <button className="flex items-center justify-center gap-2 py-1 px-4 bg-[#3e8ef7] text-white rounded-lg hover:bg-[#589FFC] transition-all duration-500 ease-in-out">
-            <IoMdSearch className="text-[16px]" /> Filter Materials
-          </button>
           <button
             className="py-1 px-4 bg-[#3e8ef7] text-white rounded-lg hover:bg-[#589FFC] transition-all duration-500 ease-in-out"
             onClick={() => handleClearFilterForm()}

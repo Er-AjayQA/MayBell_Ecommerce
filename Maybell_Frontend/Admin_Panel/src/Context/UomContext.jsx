@@ -17,8 +17,6 @@ export const UomContext = ({ children }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(null);
   const [sort, setSort] = useState(false);
-  const [imageModal, setImageModal] = useState(false);
-  const [currentModalImage, setCurrentModalImage] = useState(null);
 
   const navigate = useNavigate();
 
@@ -47,18 +45,6 @@ export const UomContext = ({ children }) => {
       setUpdateIdState(false);
       setUomDetails([]);
     }
-  };
-
-  // Handle Open Image Modal
-  const handleOpenImageModal = (imgPath) => {
-    setImageModal(true);
-    setCurrentModalImage(imgPath);
-  };
-
-  // Handle Image Close Modal
-  const handleCloseImageModal = () => {
-    setImageModal(false);
-    setCurrentModalImage(null);
   };
 
   // Handle Create Form
@@ -113,7 +99,6 @@ export const UomContext = ({ children }) => {
     const response = await getUomDetailById(updateId);
     if (response.success) {
       setUomDetails(response.data);
-      setCurrentImage(response.data.image);
     }
   };
 
@@ -145,14 +130,9 @@ export const UomContext = ({ children }) => {
     updateIdState,
     uomDetails,
     updateId,
-    imageModal,
     currentPage,
-    currentModalImage,
-    currentImage,
-    setCurrentImage,
     handleOpenModal,
     onCloseModal,
-    handleCloseImageModal,
     setOpenModal,
     handleSortData,
     handleFilterFormVisibility,
@@ -163,7 +143,6 @@ export const UomContext = ({ children }) => {
     onPageChange,
     handleUpdateId,
     handleSelection,
-    handleOpenImageModal,
     getAllUomData,
   };
 

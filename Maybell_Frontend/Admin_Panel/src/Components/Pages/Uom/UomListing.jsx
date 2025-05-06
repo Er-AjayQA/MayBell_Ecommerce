@@ -30,37 +30,36 @@ import { UomFilterForm } from "../../UI/UOM/UomFilterForm";
 import { AddUom } from "../../UI/UOM/AddUom";
 import UomContextData from "../../../Context/UomContext";
 import { BreadCrumbActionButtons } from "../../UI/UOM/ActionButtons";
+import {
+  changeUomStatusService,
+  deleteMultipleUomService,
+  deleteUomService,
+} from "../../../Services/UOM";
 
 export const UomTableListing = () => {
   const {
-    imageModal,
     currentPage,
-    allCategories,
+    allUom,
     filterData,
     totalRecords,
     totalPages,
-    currentModalImage,
     handleFilterData,
     onPageChange,
     handleUpdateId,
     handleSelection,
-    getAllCategoriesData,
+    getAllUomData,
     handleSortData,
-    handleCloseImageModal,
-    handleOpenImageModal,
   } = useContext(UomContextData);
 
   const [selectedRecords, setSelectedRecords] = useState([]);
 
   // Handle Download CSV
   const handleDownloadCSV = () => {
-    const dataToExport = allCategories.map((category) => ({
-      Name: category.name,
-      "Banner Image": category.image
-        ? `=HYPERLINK("${category.image}", "Click to View")`
-        : "N/A",
-      Order: category.order || "N/A",
-      Status: category.status ? "Active" : "Inactive",
+    const dataToExport = allUom.map((uom) => ({
+      Name: uom.name,
+      Description: uom.description || "N/A",
+      Order: uom.order || "N/A",
+      Status: uom.status ? "Active" : "Inactive",
     }));
 
     const csv = Papa.unparse(dataToExport);
@@ -68,7 +67,7 @@ export const UomTableListing = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", "categoriesList.csv");
+    link.setAttribute("download", "uomList.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -81,15 +80,15 @@ export const UomTableListing = () => {
 
       // Add title
       doc.setFontSize(16);
-      doc.text("Categories List", 14, 15);
+      doc.text("UOM List", 14, 15);
 
       // Prepare data for the table
       const headers = [["Name", "Category Image", "Order", "Status"]];
-      const tableData = allCategories.map((category) => [
-        category.name,
-        category.image ? "View" : "N/A",
-        category.order || "N/A",
-        category.status ? "Active" : "Inactive",
+      const tableData = allUom.map((uom) => [
+        uom.name,
+        uom.description ? uom.description : "N/A",
+        uom.order || "N/A",
+        uom.status ? "Active" : "Inactive",
       ]);
 
       // Add table using the separately imported autoTable
@@ -119,29 +118,10 @@ export const UomTableListing = () => {
             cellWidth: 60, // Set your desired fixed width here (in mm)
           },
         },
-        didDrawCell: (data) => {
-          // Check if we're drawing the image column (index 1) and cell has content
-          if (data.column.index === 1 && data.cell.raw === "View") {
-            const category = allCategories[data.row.index];
-            if (category.image) {
-              // Add clickable link with new window flag
-              doc.link(
-                data.cell.x,
-                data.cell.y,
-                data.cell.width,
-                data.cell.height,
-                {
-                  url: category.image,
-                  newWindow: true, // This flag should theoretically open in new window
-                }
-              );
-            }
-          }
-        },
       });
 
       // Save the PDF
-      doc.save("categoriesList.pdf");
+      doc.save("uomList.pdf");
     } catch (error) {
       console.error("Error generating PDF:", error);
       toast.error("Failed to generate PDF");
@@ -163,8 +143,8 @@ export const UomTableListing = () => {
   // Handle Select All Checkboxes
   const handleSelectAllCheckboxes = (event) => {
     if (event.target.checked) {
-      const data = allCategories.map((material) => {
-        return material._id;
+      const data = allUom.map((uom) => {
+        return uom._id;
       });
       setSelectedRecords(data);
     } else {
@@ -174,33 +154,33 @@ export const UomTableListing = () => {
 
   // Change Status of Materials
   const handleStatusChange = async (id) => {
-    const response = await changeCategoryStatusService({ id });
+    const response = await changeUomStatusService({ id });
 
     if (response.success) {
       toast.success(response.message);
-      getAllCategoriesData();
+      getAllUomData();
     }
   };
 
-  // Handle Delete Materials
-  const handleDeleteCategory = async (id) => {
-    const response = await deleteCategoryService({ id });
+  // Handle Delete UOM
+  const handleDeleteUom = async (id) => {
+    const response = await deleteUomService({ id });
 
     if (response.success) {
       toast.success(response.message);
-      getAllCategoriesData();
+      getAllUomData();
     }
   };
 
   // Handle Delete Multiple Data
-  const handleDeleteMultipleCategories = async () => {
-    const response = await deleteMultipleCategoryService({
+  const handleDeleteMultipleUom = async () => {
+    const response = await deleteMultipleUomService({
       ids: selectedRecords,
     });
 
     if (response.success) {
       toast.success(response.message);
-      getAllCategoriesData();
+      getAllUomData();
     } else {
       toast.error(response.message);
     }
@@ -286,7 +266,7 @@ export const UomTableListing = () => {
                 <Tooltip content="Delete Selected" placement="top">
                   <button
                     className="p-2 text-red-500 hover:bg-gray-100 rounded-lg border border-gray-200"
-                    onClick={handleDeleteMultipleCategories}
+                    onClick={handleDeleteMultipleUom}
                   >
                     <RiDeleteBin5Fill />
                   </button>
@@ -322,56 +302,56 @@ export const UomTableListing = () => {
                     defaultChecked="false"
                     onChange={handleSelectAllCheckboxes}
                     checked={
-                      allCategories.length >= 1 &&
-                      selectedRecords.length === allCategories.length
+                      allUom.length >= 1 &&
+                      selectedRecords.length === allUom.length
                         ? "checked"
                         : ""
                     }
                   />
                 </Table.HeadCell>
                 <Table.HeadCell className="capitalize">Name</Table.HeadCell>
-                <Table.HeadCell className="capitalize">Desc</Table.HeadCell>
+                <Table.HeadCell className="capitalize">
+                  Description
+                </Table.HeadCell>
                 <Table.HeadCell className="capitalize">Order</Table.HeadCell>
                 <Table.HeadCell className="capitalize">Status</Table.HeadCell>
                 <Table.HeadCell className="capitalize">Action</Table.HeadCell>
               </Table.Head>
 
               <Table.Body className="divide-y ">
-                {allCategories?.length >= 1 ? (
-                  allCategories.map((category) => {
+                {allUom?.length >= 1 ? (
+                  allUom.map((uom) => {
                     return (
                       <Table.Row
                         className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center"
-                        key={category?._id}
+                        key={uom?._id}
                       >
                         <Table.Cell className="p-4">
                           <Checkbox
                             defaultChecked="false"
-                            onClick={() =>
-                              handleCheckboxSelection(category?._id)
-                            }
+                            onClick={() => handleCheckboxSelection(uom?._id)}
                             checked={
-                              selectedRecords.includes(category?._id)
+                              selectedRecords.includes(uom?._id)
                                 ? "checked"
                                 : ""
                             }
                           />
                         </Table.Cell>
                         <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                          {category?.name}
+                          {uom?.name}
                         </Table.Cell>
                         <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                          {category?.description}
+                          {uom?.description ? uom.description : "N/A"}
                         </Table.Cell>
-                        <Table.Cell>{category?.order}</Table.Cell>
+                        <Table.Cell>{uom?.order}</Table.Cell>
                         <Table.Cell>
                           <div
                             className={`w-[50px] h-[20px] border border-gray-300 m-auto shadow-md rounded-full cursor-pointer flex items-center transition-colors duration-300 ${
-                              category?.status
+                              uom?.status
                                 ? "bg-green-400 justify-end"
                                 : "bg-red-400 justify-start"
                             }`}
-                            onClick={() => handleStatusChange(category?._id)}
+                            onClick={() => handleStatusChange(uom?._id)}
                           >
                             <span
                               className={`w-[24px] h-[18px] bg-white border-solid border-[1px] border-black rounded-full shadow-inner transform transition-transform duration-300`}
@@ -381,19 +361,15 @@ export const UomTableListing = () => {
                         <Table.Cell>
                           <div className="flex justify-center items-center gap-2">
                             <Link
-                              to={`/furniture/admin-panel/category/update/${category?._id}`}
+                              to={`/furniture/admin-panel/uom/update/${uom?._id}`}
                               className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-green-400 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out"
-                              onClick={() =>
-                                handleUpdateId(category?._id, "update")
-                              }
+                              onClick={() => handleUpdateId(uom?._id, "update")}
                             >
                               <MdEdit />
                             </Link>
                             <button
                               className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-red-600 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out"
-                              onClick={() =>
-                                handleDeleteCategory(category?._id)
-                              }
+                              onClick={() => handleDeleteUom(uom?._id)}
                             >
                               <MdDeleteForever />
                             </button>
@@ -423,7 +399,7 @@ export const UomTableListing = () => {
                 </span>
                 to
                 <span className="font-semibold text-gray-900 dark:text-white">
-                  {allCategories.length}
+                  {allUom.length}
                 </span>
                 of
                 <span className="font-semibold text-gray-900 dark:text-white">
