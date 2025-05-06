@@ -1,22 +1,20 @@
 // Imports & Configs
 const mongoose = require("mongoose");
 
-// Define Colors Schema
-const SlidersSchema = new mongoose.Schema({
-  title: {
+// Define Category Schema
+const UOMSchema = new mongoose.Schema({
+  name: {
     type: String,
     required: true,
-    unique: true,
   },
-  slider_order: {
-    type: Number,
-    required: true,
-    unique: true,
+  slug: {
+    type: String,
+    default: "",
   },
-  image: {
+  description: {
     type: String,
   },
-  order: { type: Number, min: 0, max: 10000, default: 0 },
+  order: { type: Number, min: 1, max: 10000, default: 1 },
   status: {
     type: Boolean,
     default: true,
@@ -36,4 +34,4 @@ const SlidersSchema = new mongoose.Schema({
 });
 
 // Create And Export Model
-module.exports = mongoose.model("slider", SlidersSchema);
+module.exports = mongoose.model("uom", UOMSchema);

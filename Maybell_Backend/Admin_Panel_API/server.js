@@ -12,12 +12,9 @@ const defaultRoutes = require("./api/default/router/default.router");
 const materialsRoutes = require("./api/Materials/router/materials.router");
 const colorsRoutes = require("./api/Colors/router/colors.router");
 const adminsRoutes = require("./api/Admins/router/admin.router");
-const slidersRoutes = require("./api/Sliders/router/sliders.router");
-const testimonialsRoutes = require("./api/Testimonials/router/testimonials.router");
-const whyChooseUsRoutes = require("./api/WhyChooseUs/router/whyChooseUs.router");
-const couponsRoutes = require("./api/Coupons/router/coupons.router");
 const categoryRoutes = require("./api/Categories/router/category.router");
 const subCategoryRoutes = require("./api/SubCategory/router/subCategory.router");
+const uomRoutes = require("./api/UOM/router/uom.router");
 
 // Using Middlewares
 app.use(
@@ -38,11 +35,8 @@ app.use("/api/v1/admin/materials", materialsRoutes);
 app.use("/api/v1/admin/colors", colorsRoutes);
 app.use("/api/v1/admin/categories", categoryRoutes);
 app.use("/api/v1/admin/sub-categories", subCategoryRoutes);
+app.use("/api/v1/admin/uom", uomRoutes);
 app.use("/api/v1/admin/admin-user", adminsRoutes);
-app.use("/api/v1/admin/sliders", slidersRoutes);
-app.use("/api/v1/admin/testimonials", testimonialsRoutes);
-app.use("/api/v1/admin/why-choose-us", whyChooseUsRoutes);
-app.use("/api/v1/admin/coupons", couponsRoutes);
 
 // Listening to Server
 app.listen(PORT, (err) => {
