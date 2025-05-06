@@ -15,6 +15,7 @@ const adminsRoutes = require("./api/Admins/router/admin.router");
 const categoryRoutes = require("./api/Categories/router/category.router");
 const subCategoryRoutes = require("./api/SubCategory/router/subCategory.router");
 const uomRoutes = require("./api/UOM/router/uom.router");
+const brandsRoutes = require("./api/Brands/router/brands.router");
 
 // Using Middlewares
 app.use(
@@ -36,6 +37,7 @@ app.use("/api/v1/admin/colors", colorsRoutes);
 app.use("/api/v1/admin/categories", categoryRoutes);
 app.use("/api/v1/admin/sub-categories", subCategoryRoutes);
 app.use("/api/v1/admin/uom", uomRoutes);
+app.use("/api/v1/admin/brands", brandsRoutes);
 app.use("/api/v1/admin/admin-user", adminsRoutes);
 
 // Listening to Server

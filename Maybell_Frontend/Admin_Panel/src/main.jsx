@@ -31,6 +31,8 @@ import { SubCategoryContext } from "./Context/SubCategoryContext";
 import { SubCategoryTableListing } from "./Components/Pages/SubCategory/SubCategoryListing";
 import { UomContext } from "./Context/UomContext";
 import { UomTableListing } from "./Components/Pages/Uom/UomListing";
+import { BrandsContext } from "./Context/BrandsContext";
+import { BrandsTableListing } from "./Components/Pages/Brands/BrandsListing";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -207,6 +209,35 @@ createRoot(document.getElementById("root")).render(
               />
             </Route>
             {/* UOM Route End */}
+
+            {/* Brands Route Start */}
+            <Route path="/furniture/admin-panel/brands">
+              <Route
+                path="create"
+                element={
+                  <BrandsContext>
+                    <BrandsTableListing />
+                  </BrandsContext>
+                }
+              />
+              <Route
+                path="update/:id"
+                element={
+                  <BrandsContext>
+                    <BrandsTableListing />
+                  </BrandsContext>
+                }
+              />
+              <Route
+                path=""
+                element={
+                  <BrandsContext>
+                    <BrandsTableListing />
+                  </BrandsContext>
+                }
+              />
+            </Route>
+            {/* Brands Route End */}
 
             <Route
               path="/furniture/admin-panel/products"

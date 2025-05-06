@@ -72,7 +72,8 @@ export const SideBarMenu = () => {
         },
         { id: 111, name: "Colors", url: "/furniture/admin-panel/colors" },
         { id: 112, name: "UOM", url: "/furniture/admin-panel/uom" },
-        { id: 113, name: "Products", url: "/furniture/admin-panel/products" },
+        { id: 113, name: "Brands", url: "/furniture/admin-panel/brands" },
+        { id: 114, name: "Products", url: "/furniture/admin-panel/products" },
       ],
     },
     {
@@ -81,12 +82,12 @@ export const SideBarMenu = () => {
       icon: <LuSpeech />,
       subMenu: [
         {
-          id: 114,
+          id: 115,
           name: "Contact Enquiry",
           url: "/furniture/admin-panel/enquiry",
         },
         {
-          id: 115,
+          id: 116,
           name: "Newsletters",
           url: "/furniture/admin-panel/newsletters",
         },
@@ -98,12 +99,12 @@ export const SideBarMenu = () => {
       icon: <GrConfigure />,
       subMenu: [
         {
-          id: 116,
+          id: 117,
           name: "Payment Gateways",
           url: "/furniture/admin-panel/payment-gateways",
         },
         {
-          id: 117,
+          id: 118,
           name: "Configurations",
           url: "/furniture/admin-panel/configurations",
         },
