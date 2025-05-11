@@ -1,7 +1,7 @@
 // Imports & Configs
 const mongoose = require("mongoose");
 
-// Define Category Schema
+// Define Brand Schema
 const BrandSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -32,4 +32,4 @@ const BrandSchema = new mongoose.Schema({
 });
 
 // Create And Export Model
-module.exports = mongoose.model("category", BrandSchema);
+module.exports = mongoose.model("brand", BrandSchema);

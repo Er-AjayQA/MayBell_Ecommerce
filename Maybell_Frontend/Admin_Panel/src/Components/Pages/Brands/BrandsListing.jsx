@@ -1,14 +1,4 @@
-import {
-  Table,
-  Checkbox,
-  Tooltip,
-  Pagination,
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-} from "flowbite-react";
+import { Table, Checkbox, Tooltip, Pagination } from "flowbite-react";
 import { useContext, useState } from "react";
 import { FaFilePdf } from "react-icons/fa";
 import { MdDeleteForever, MdEdit } from "react-icons/md";
@@ -21,11 +11,6 @@ import { BreadCrumb } from "../../UI/Breadcrumb";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable"; // Import autoTable separately
 import Papa from "papaparse";
-import {
-  changeCategoryStatusService,
-  deleteCategoryService,
-  deleteMultipleCategoryService,
-} from "../../../Services/CategoryServices";
 import BrandsContextData from "../../../Context/BrandsContext";
 import { BreadCrumbActionButtons } from "../../UI/Brands/ActionButtons";
 import { AddBrands } from "../../UI/Brands/AddBrands";
@@ -38,21 +23,17 @@ import {
 
 export const BrandsTableListing = () => {
   const {
-    imageModal,
     currentPage,
     allBrands,
     filterData,
     totalRecords,
     totalPages,
-    currentModalImage,
     handleFilterData,
     onPageChange,
     handleUpdateId,
     handleSelection,
     getAllBrandsData,
     handleSortData,
-    handleCloseImageModal,
-    handleOpenImageModal,
   } = useContext(BrandsContextData);
 
   const [selectedRecords, setSelectedRecords] = useState([]);
@@ -291,7 +272,7 @@ export const BrandsTableListing = () => {
                 <Tooltip content="Delete Selected" placement="top">
                   <button
                     className="p-2 text-red-500 hover:bg-gray-100 rounded-lg border border-gray-200"
-                    onClick={handleDeleteMultipleCategories}
+                    onClick={handleDeleteMultipleBrands}
                   >
                     <RiDeleteBin5Fill />
                   </button>
@@ -327,92 +308,50 @@ export const BrandsTableListing = () => {
                     defaultChecked="false"
                     onChange={handleSelectAllCheckboxes}
                     checked={
-                      allCategories.length >= 1 &&
-                      selectedRecords.length === allCategories.length
+                      allBrands.length >= 1 &&
+                      selectedRecords.length === allBrands.length
                         ? "checked"
                         : ""
                     }
                   />
                 </Table.HeadCell>
                 <Table.HeadCell>Name</Table.HeadCell>
-                <Table.HeadCell>Image</Table.HeadCell>
                 <Table.HeadCell>Order</Table.HeadCell>
                 <Table.HeadCell>Status</Table.HeadCell>
                 <Table.HeadCell>Action</Table.HeadCell>
               </Table.Head>
 
               <Table.Body className="divide-y ">
-                {allCategories?.length >= 1 ? (
-                  allCategories.map((category) => {
+                {allBrands?.length >= 1 ? (
+                  allBrands.map((brand) => {
                     return (
                       <Table.Row
                         className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center"
-                        key={category?._id}
+                        key={brand?._id}
                       >
                         <Table.Cell className="p-4">
                           <Checkbox
                             defaultChecked="false"
-                            onClick={() =>
-                              handleCheckboxSelection(category?._id)
-                            }
+                            onClick={() => handleCheckboxSelection(brand?._id)}
                             checked={
-                              selectedRecords.includes(category?._id)
+                              selectedRecords.includes(brand?._id)
                                 ? "checked"
                                 : ""
                             }
                           />
                         </Table.Cell>
                         <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                          {category?.name}
+                          {brand?.name}
                         </Table.Cell>
-                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                          {category?.image ? (
-                            <>
-                              <img
-                                src={category?.image}
-                                className="w-[50px] h-[50px] mx-auto cursor-pointer object-contain"
-                                onClick={() => {
-                                  handleOpenImageModal(category?.image);
-                                }}
-                              />
-                              <Modal
-                                show={imageModal}
-                                onClose={handleCloseImageModal}
-                              >
-                                <ModalHeader>Category Banner Image</ModalHeader>
-                                <ModalBody>
-                                  <div className="space-y-6">
-                                    <img
-                                      src={currentModalImage}
-                                      className="w-[350px] h-[350px] mx-auto object-contain"
-                                      onClick={() => setOpenModal(true)}
-                                    />
-                                  </div>
-                                </ModalBody>
-                                <ModalFooter>
-                                  <Button
-                                    color="gray"
-                                    onClick={handleCloseImageModal}
-                                    className="mx-auto"
-                                  >
-                                    Close
-                                  </Button>
-                                </ModalFooter>
-                              </Modal>
-                            </>
-                          ) : (
-                            "N/A"
-                          )}
-                        </Table.Cell>
-                        <Table.Cell>{category?.order}</Table.Cell>
+                        <Table.Cell>{brand?.order}</Table.Cell>
                         <Table.Cell>
                           <div
                             className={`w-[50px] h-[20px] border border-gray-300 m-auto shadow-md rounded-full cursor-pointer flex items-center transition-colors duration-300 ${
-                              category?.status
+                              brand?.status
                                 ? "bg-green-400 justify-end"
                                 : "bg-red-400 justify-start"
                             }`}
-                            onClick={() => handleStatusChange(category?._id)}
+                            onClick={() => handleStatusChange(brand?._id)}
                           >
                             <span
                               className={`w-[24px] h-[18px] bg-white border-solid border-[1px] border-black rounded-full shadow-inner transform transition-transform duration-300`}
@@ -422,19 +361,17 @@ export const BrandsTableListing = () => {
                         <Table.Cell>
                           <div className="flex justify-center items-center gap-2">
                             <Link
-                              to={`/furniture/admin-panel/category/update/${category?._id}`}
+                              to={`/furniture/admin-panel/brands/update/${brand?._id}`}
                               className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-green-400 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out"
                               onClick={() =>
-                                handleUpdateId(category?._id, "update")
+                                handleUpdateId(brand?._id, "update")
                               }
                             >
                               <MdEdit />
                             </Link>
                             <button
                               className="p-2 flex justify-center items-center rounded-full bg-[#3E8EF7] text-white text-[20px] hover:text-red-600 hover:bg-gray-300 shadow-sm transition-all duration-300 ease-in-out"
-                              onClick={() =>
-                                handleDeleteCategory(category?._id)
-                              }
+                              onClick={() => handleDeleteBrand(brand?._id)}
                             >
                               <MdDeleteForever />
                             </button>
@@ -464,7 +401,7 @@ export const BrandsTableListing = () => {
                 </span>
                 to
                 <span className="font-semibold text-gray-900 dark:text-white">
-                  {allCategories.length}
+                  {allBrands.length}
                 </span>
                 of
                 <span className="font-semibold text-gray-900 dark:text-white">

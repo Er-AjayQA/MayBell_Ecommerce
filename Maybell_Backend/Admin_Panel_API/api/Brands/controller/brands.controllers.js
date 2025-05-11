@@ -42,10 +42,6 @@ exports.create = async (req, res) => {
       slug,
     };
 
-    if (req.file) {
-      data.logo = req.file.path;
-    }
-
     const createData = await BrandsModel.create(data);
     await createData.save();
 
@@ -86,9 +82,9 @@ exports.getAll = async (req, res) => {
     }
 
     // Calculate total number of records
-    const totalRecords = await CategoryModel.countDocuments(filter);
+    const totalRecords = await BrandsModel.countDocuments(filter);
 
-    const getAllData = await CategoryModel.find(filter)
+    const getAllData = await BrandsModel.find(filter)
       .limit(limit)
       .skip(skip)
       .sort({
@@ -122,7 +118,7 @@ exports.getDetails = async (req, res) => {
 
     const filter = { deletedAt: null };
 
-    const getDetails = await CategoryModel.findOne({ ...filter, _id: id });
+    const getDetails = await BrandsModel.findOne({ ...filter, _id: id });
 
     const success = !getDetails ? false : true;
     const responseStatus = !getDetails ? 404 : 200;
@@ -151,7 +147,7 @@ exports.update = async (req, res) => {
 
     const { name, order } = req.body;
 
-    const ifAlreadyExist = await CategoryModel.find({
+    const ifAlreadyExist = await BrandsModel.find({
       _id: { $ne: id },
       deletedAt: null,
       $or: [{ name }, { order }],
@@ -170,12 +166,9 @@ exports.update = async (req, res) => {
     const data = {};
     if (name) data.name = name;
     if (order) data.order = order;
+    data.slug = slug;
 
-    if (req.file) {
-      data.image = req.file.path;
-    }
-
-    const updateData = await CategoryModel.updateOne(
+    const updateData = await BrandsModel.updateOne(
       { _id: id },
       {
         $set: data,
@@ -201,7 +194,7 @@ exports.updateStatus = async (req, res) => {
   try {
     const { id } = req.body;
 
-    const updateData = await CategoryModel.updateOne({ _id: id }, [
+    const updateData = await BrandsModel.updateOne({ _id: id }, [
       { $set: { status: { $not: "$status" } } },
     ]);
 
@@ -224,7 +217,7 @@ exports.delete = async (req, res) => {
   try {
     const { id } = req.body;
 
-    const deleteData = await CategoryModel.updateOne(
+    const deleteData = await BrandsModel.updateOne(
       {
         _id: id,
       },
@@ -258,7 +251,7 @@ exports.deleteMultiple = async (req, res) => {
       });
     }
 
-    const deleteData = await CategoryModel.updateMany(
+    const deleteData = await BrandsModel.updateMany(
       {
         _id: {
           $in: ids,

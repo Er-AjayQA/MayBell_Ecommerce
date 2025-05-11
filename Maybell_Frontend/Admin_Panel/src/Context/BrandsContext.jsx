@@ -20,9 +20,6 @@ export const BrandsContext = ({ children }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(null);
   const [sort, setSort] = useState(false);
-  const [imageModal, setImageModal] = useState(false);
-  const [currentModalImage, setCurrentModalImage] = useState(null);
-  const [currentImage, setCurrentImage] = useState(null);
 
   const navigate = useNavigate();
 
@@ -53,24 +50,12 @@ export const BrandsContext = ({ children }) => {
     }
   };
 
-  // Handle Open Image Modal
-  const handleOpenImageModal = (imgPath) => {
-    setImageModal(true);
-    setCurrentModalImage(imgPath);
-  };
-
-  // Handle Image Close Modal
-  const handleCloseImageModal = () => {
-    setImageModal(false);
-    setCurrentModalImage(null);
-  };
-
   // Handle Create Form
   const onCloseModal = () => {
     setOpenModal(false);
     setUpdateId(null);
     setUpdateIdState(false);
-    navigate("/furniture/admin-panel/category");
+    navigate("/furniture/admin-panel/brands");
   };
 
   // Get All Existing Categories
@@ -117,7 +102,6 @@ export const BrandsContext = ({ children }) => {
     const response = await getBrandsDetailById(updateId);
     if (response.success) {
       setBrandsDetails(response.data);
-      setCurrentImage(response.data.image);
     }
   };
 
@@ -149,14 +133,9 @@ export const BrandsContext = ({ children }) => {
     updateIdState,
     brandsDetails,
     updateId,
-    imageModal,
     currentPage,
-    currentModalImage,
-    currentImage,
-    setCurrentImage,
     handleOpenModal,
     onCloseModal,
-    handleCloseImageModal,
     setOpenModal,
     handleSortData,
     handleFilterFormVisibility,
@@ -167,7 +146,6 @@ export const BrandsContext = ({ children }) => {
     onPageChange,
     handleUpdateId,
     handleSelection,
-    handleOpenImageModal,
     getAllBrandsData,
   };
 
