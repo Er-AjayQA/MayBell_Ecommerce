@@ -40,13 +40,10 @@ export const BrandsTableListing = () => {
 
   // Handle Download CSV
   const handleDownloadCSV = () => {
-    const dataToExport = allCategories.map((category) => ({
-      Name: category.name,
-      "Banner Image": category.image
-        ? `=HYPERLINK("${category.image}", "Click to View")`
-        : "N/A",
-      Order: category.order || "N/A",
-      Status: category.status ? "Active" : "Inactive",
+    const dataToExport = allBrands.map((brand) => ({
+      Name: brand.name,
+      Order: brand.order || "N/A",
+      Status: brand.status ? "Active" : "Inactive",
     }));
 
     const csv = Papa.unparse(dataToExport);
@@ -54,7 +51,7 @@ export const BrandsTableListing = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", "categoriesList.csv");
+    link.setAttribute("download", "brandsList.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -67,15 +64,14 @@ export const BrandsTableListing = () => {
 
       // Add title
       doc.setFontSize(16);
-      doc.text("Categories List", 14, 15);
+      doc.text("Brands List", 14, 15);
 
       // Prepare data for the table
-      const headers = [["Name", "Category Image", "Order", "Status"]];
-      const tableData = allCategories.map((category) => [
-        category.name,
-        category.image ? "View" : "N/A",
-        category.order || "N/A",
-        category.status ? "Active" : "Inactive",
+      const headers = [["Name", "Order", "Status"]];
+      const tableData = allBrands.map((brand) => [
+        brand.name,
+        brand.order || "N/A",
+        brand.status ? "Active" : "Inactive",
       ]);
 
       // Add table using the separately imported autoTable
@@ -105,29 +101,10 @@ export const BrandsTableListing = () => {
             cellWidth: 60, // Set your desired fixed width here (in mm)
           },
         },
-        didDrawCell: (data) => {
-          // Check if we're drawing the image column (index 1) and cell has content
-          if (data.column.index === 1 && data.cell.raw === "View") {
-            const category = allCategories[data.row.index];
-            if (category.image) {
-              // Add clickable link with new window flag
-              doc.link(
-                data.cell.x,
-                data.cell.y,
-                data.cell.width,
-                data.cell.height,
-                {
-                  url: category.image,
-                  newWindow: true, // This flag should theoretically open in new window
-                }
-              );
-            }
-          }
-        },
       });
 
       // Save the PDF
-      doc.save("categoriesList.pdf");
+      doc.save("brandsList.pdf");
     } catch (error) {
       console.error("Error generating PDF:", error);
       toast.error("Failed to generate PDF");
