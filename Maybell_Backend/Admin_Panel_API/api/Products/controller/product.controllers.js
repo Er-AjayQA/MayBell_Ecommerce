@@ -1,54 +1,58 @@
 // Imports & Configs
-// const slugify = require("slugify");
-// const { generateUniqueSlug } = require("../../../helpers/utility");
-const CategoryModel = require("../model/category.model");
+const ProductModel = require("../model/product.model");
 const { generateSlug } = require("../../../helpers/utility");
 
 // Create New Data
 exports.create = async (req, res) => {
   try {
-    const { name, order } = req.body;
+    let slug = generateSlug(req.body.name);
+
+    var dataSave = req.body;
+    dataSave.slug = slug;
 
     let lastOrderValue = 1;
 
     // Get count to handle empty collection case
-    const dataCount = await CategoryModel.countDocuments({
+    const dataCount = await ProductModel.countDocuments({
       deletedAt: null,
     });
 
-    if (!order && dataCount > 0) {
-      const lastData = await CategoryModel.findOne({ deletedAt: null })
+    if (!dataSave.order && dataCount > 0) {
+      const lastData = await ProductModel.findOne({ deletedAt: null })
         .sort({ order: -1 })
         .limit(1);
       lastOrderValue = lastData ? lastData.order + 1 : lastOrderValue + 1;
     }
 
-    const alreadyExist = await CategoryModel.findOne({
-      $or: [{ name }, { order: order ? order : lastOrderValue }],
+    if (!dataSave.order) {
+      dataSave.order = lastOrderValue;
+    }
+
+    const alreadyExist = await ProductModel.findOne({
+      $or: [
+        {
+          $and: [
+            { name: dataSave.name },
+            { category_id: dataSave.category_id },
+            { subCategory_id: dataSave.subCategory_id },
+          ],
+        },
+        {
+          order: dataSave.order,
+        },
+      ],
       deletedAt: null,
     });
 
     if (alreadyExist) {
       return res.status(201).json({
         success: false,
-        message: "Duplicate name or order no.!!",
+        message: "Duplicate name, order no.!!",
         data: [],
       });
     }
 
-    let slug = generateSlug(name);
-
-    const data = {
-      name,
-      order: order ? order : lastOrderValue,
-      slug,
-    };
-
-    if (req.file) {
-      data.image = req.file.path;
-    }
-
-    const createData = await CategoryModel.create(data);
+    const createData = await ProductModel.create(dataSave);
     await createData.save();
 
     return res.status(201).json({
@@ -65,32 +69,32 @@ exports.create = async (req, res) => {
   }
 };
 
-// Get All Categories
+// Get All Products
 exports.getAll = async (req, res) => {
   try {
     let limit = parseInt(req?.body?.limit) || 15;
     let page = parseInt(req?.body?.page) || 1;
     if (limit < 1) limit = 15;
     if (page < 1) page = 1;
-    const { name, sort, status } = req.body;
+    const { name, sort, category_id } = req.body;
 
     let skip = (page - 1) * limit;
 
     const filter = { deletedAt: null };
-
-    if (status !== undefined) {
-      filter.status = status;
-    }
 
     if (name != "" && name != undefined) {
       var nameRegex = new RegExp(name, "i");
       filter.name = nameRegex;
     }
 
+    if (category_id) {
+      filter.category_id = category_id;
+    }
     // Calculate total number of records
-    const totalRecords = await CategoryModel.countDocuments(filter);
+    const totalRecords = await SubCategoryModel.countDocuments(filter);
 
-    const getAllData = await CategoryModel.find(filter)
+    const getAllData = await SubCategoryModel.find(filter)
+      .populate({ path: "category_id", select: "name" })
       .limit(limit)
       .skip(skip)
       .sort({
@@ -124,7 +128,10 @@ exports.getDetails = async (req, res) => {
 
     const filter = { deletedAt: null };
 
-    const getDetails = await CategoryModel.findOne({ ...filter, _id: id });
+    const getDetails = await SubCategoryModel.findOne({
+      ...filter,
+      _id: id,
+    }).populate({ path: "category_id", select: "name" });
 
     const success = !getDetails ? false : true;
     const responseStatus = !getDetails ? 404 : 200;
@@ -146,17 +153,24 @@ exports.getDetails = async (req, res) => {
   }
 };
 
-// Update Categories By Id
+// Update Products By Id
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { name, order } = req.body;
+    const { name, order, category_id } = req.body;
 
-    const ifAlreadyExist = await CategoryModel.find({
+    const ifAlreadyExist = await SubCategoryModel.find({
       _id: { $ne: id },
       deletedAt: null,
-      $or: [{ name }, { order }],
+      $or: [
+        {
+          $and: [{ name }, { category_id }],
+        },
+        {
+          order,
+        },
+      ],
     });
 
     if (ifAlreadyExist.length > 0) {
@@ -172,15 +186,20 @@ exports.update = async (req, res) => {
     const data = {};
     if (name) data.name = name;
     if (order) data.order = order;
+    if (category_id) data.category_id = category_id;
 
+    // Handle file upload
     if (req.file) {
-      data.image = req.file.path;
+      data.subCategory_img = req.file.path;
     }
 
-    const updateData = await CategoryModel.updateOne(
+    const updateData = await SubCategoryModel.updateOne(
       { _id: id },
       {
-        $set: data,
+        $set: {
+          ...data,
+          slug,
+        },
       }
     );
 
@@ -203,7 +222,7 @@ exports.updateStatus = async (req, res) => {
   try {
     const { id } = req.body;
 
-    const updateData = await CategoryModel.updateOne({ _id: id }, [
+    const updateData = await SubCategoryModel.updateOne({ _id: id }, [
       { $set: { status: { $not: "$status" } } },
     ]);
 
@@ -226,7 +245,7 @@ exports.delete = async (req, res) => {
   try {
     const { id } = req.body;
 
-    const deleteData = await CategoryModel.updateOne(
+    const deleteData = await SubCategoryModel.updateOne(
       {
         _id: id,
       },
@@ -247,7 +266,7 @@ exports.delete = async (req, res) => {
   }
 };
 
-// Delete Multiple Colors By Ids
+// Delete Multiple Products By Ids
 exports.deleteMultiple = async (req, res) => {
   try {
     const { ids } = req.body;
@@ -260,7 +279,7 @@ exports.deleteMultiple = async (req, res) => {
       });
     }
 
-    const deleteData = await CategoryModel.updateMany(
+    const deleteData = await SubCategoryModel.updateMany(
       {
         _id: {
           $in: ids,
