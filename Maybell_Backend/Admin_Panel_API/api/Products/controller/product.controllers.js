@@ -91,9 +91,9 @@ exports.getAll = async (req, res) => {
       filter.category_id = category_id;
     }
     // Calculate total number of records
-    const totalRecords = await SubCategoryModel.countDocuments(filter);
+    const totalRecords = await ProductModel.countDocuments(filter);
 
-    const getAllData = await SubCategoryModel.find(filter)
+    const getAllData = await ProductModel.find(filter)
       .populate({ path: "category_id", select: "name" })
       .limit(limit)
       .skip(skip)
