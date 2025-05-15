@@ -55,7 +55,7 @@ exports.create = async (req, res) => {
 // Get All Materials
 exports.getAll = async (req, res) => {
   try {
-    let limit = parseInt(req?.body?.limit) || 15;
+    let limit = parseInt(req?.body?.limit) || 100;
     let page = parseInt(req?.body?.page) || 1;
     if (limit < 1) limit = 15;
     if (page < 1) page = 1;

@@ -4,6 +4,7 @@ import {
   getAllProductsService,
   getProductsDetailById,
 } from "../Services/ProductsServices";
+import { getAllMaterialsService } from "../Services/MaterialServices";
 
 const ProductsContextData = createContext();
 
@@ -12,6 +13,7 @@ export const ProductsContext = ({ children }) => {
   const [filterFormStatus, setFilterFormStatus] = useState(false);
   const [filterData, setFilterData] = useState({ name: "" });
   const [allProducts, setAllProducts] = useState([]);
+  const [allMaterials, setAllMaterials] = useState([]);
   const [updateId, setUpdateId] = useState(null);
   const [productsDetails, setProductsDetails] = useState([]);
   const [updateIdState, setUpdateIdState] = useState(false);
@@ -121,6 +123,15 @@ export const ProductsContext = ({ children }) => {
     }
   };
 
+  // Get All Existing Materials
+  const getAllMaterialsData = async () => {
+    const response = await getAllMaterialsService({ name: "", sort: "asc" });
+
+    if (response.success) {
+      setAllMaterials(response.data);
+    }
+  };
+
   // Handle Sort Data
   const handleSortData = () => {
     setSort((prev) => !prev);
@@ -128,6 +139,7 @@ export const ProductsContext = ({ children }) => {
 
   useEffect(() => {
     getAllProductsData(currentLimit);
+    getAllMaterialsData();
   }, [filterData, currentLimit, currentPage, sort]);
 
   useEffect(() => {
@@ -141,6 +153,7 @@ export const ProductsContext = ({ children }) => {
 
   const data = {
     allProducts,
+    allMaterials,
     filterFormStatus,
     filterData,
     totalRecords,
