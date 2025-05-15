@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getAllProductsService,
@@ -73,22 +73,6 @@ export const ProductsContext = ({ children }) => {
     navigate("/furniture/admin-panel/products");
   };
 
-  // Get All Existing Products
-  const getAllProductsData = async () => {
-    const response = await getAllProductsService({
-      ...filterData,
-      limit: currentLimit,
-      page: currentPage,
-      sort: sort,
-    });
-
-    if (response.success) {
-      setTotalPages(response.totalPages);
-      setTotalRecords(response.totalRecords);
-      setAllProducts(response.data);
-    }
-  };
-
   // Handle On Page Change
   const onPageChange = (page) => {
     setCurrentPage(page);
@@ -110,6 +94,22 @@ export const ProductsContext = ({ children }) => {
   // Handle Current Limit
   const handleSelection = (event) => {
     setCurrentLimit(event.target.value);
+  };
+
+  // Get All Existing Products
+  const getAllProductsData = async () => {
+    const response = await getAllProductsService({
+      ...filterData,
+      limit: currentLimit,
+      page: currentPage,
+      sort: sort,
+    });
+
+    if (response.success) {
+      setTotalPages(response.totalPages);
+      setTotalRecords(response.totalRecords);
+      setAllProducts(response.data);
+    }
   };
 
   // Get Material Detail

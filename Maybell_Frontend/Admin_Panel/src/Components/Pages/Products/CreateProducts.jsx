@@ -11,6 +11,7 @@ export const CreateProductPage = () => {
     filterData,
     totalRecords,
     totalPages,
+    updateIdState,
     currentModalImage,
     handleFilterData,
     onPageChange,
@@ -28,7 +29,10 @@ export const CreateProductPage = () => {
         {/* Body Header Start */}
         <div className="flex items-center mb-3">
           {/* Breadcrumb Start */}
-          <BreadCrumb title={"Colors Listing"} subtitle={"Colors"} />
+          <BreadCrumb
+            title={"Products"}
+            subtitle={updateIdState ? "Update" : "Create"}
+          />
           {/* Breadcrumb End */}
         </div>
         {/* Body Header End */}
